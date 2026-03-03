@@ -21,8 +21,8 @@ const Index = () => {
           transition={{ duration: 0.8 }}
           className="relative z-10 text-center px-4 max-w-3xl mx-auto"
         >
-          <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-4 leading-tight">
-            خدمتِ خلق ہی اصل عبادت ہے
+          <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-4 leading-tight" dir="rtl">
+            میری ہر کاوش میرے رب کے نام
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-10">
             Serving humanity with compassion, dignity, and faith.
