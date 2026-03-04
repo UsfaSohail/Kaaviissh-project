@@ -3,8 +3,11 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ChevronDown, Eye, Target } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
+  const { t } = useLanguage();
+
   return (
     <div>
       {/* Hero Section */}
@@ -21,18 +24,18 @@ const Index = () => {
           transition={{ duration: 0.8 }}
           className="relative z-10 text-center px-4 max-w-3xl mx-auto"
         >
-          <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-4 leading-tight" dir="rtl">
-            میری ہر کاوش میرے رب کے نام
+          <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-4 leading-tight" dir="rtl" style={{ fontFamily: "'Noto Nastaliq Urdu', serif" }}>
+            {t("hero.tagline")}
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-10">
-            Serving humanity with compassion, dignity, and faith.
+            {t("hero.subtitle")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/donate">
-              <Button variant="hero">Donate Now</Button>
+              <Button variant="hero">{t("hero.donate")}</Button>
             </Link>
             <Link to="/apply">
-              <Button variant="heroOutline">Apply for Help</Button>
+              <Button variant="heroOutline">{t("hero.apply")}</Button>
             </Link>
           </div>
         </motion.div>
@@ -52,9 +55,9 @@ const Index = () => {
           className="max-w-2xl mx-auto text-center"
         >
           <p className="text-xl md:text-2xl text-foreground italic leading-relaxed font-light">
-            "The believer's shade on the Day of Resurrection will be his charity."
+            {t("hadith.text")}
           </p>
-          <p className="text-primary mt-4 text-sm font-medium">— Prophet Muhammad (ﷺ)</p>
+          <p className="text-primary mt-4 text-sm font-medium">{t("hadith.source")}</p>
         </motion.div>
       </section>
 
@@ -71,13 +74,9 @@ const Index = () => {
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Target size={20} className="text-primary" />
               </div>
-              <h2 className="text-2xl font-bold text-foreground">Our Mission</h2>
+              <h2 className="text-2xl font-bold text-foreground">{t("mission.title")}</h2>
             </div>
-            <p className="text-muted-foreground leading-relaxed">
-              KAAVIISH is dedicated to uplifting underprivileged communities across Pakistan through ration drives,
-              financial assistance, and sustained welfare programs. We bridge the gap between those who can give
-              and those in dire need, ensuring every contribution reaches the right hands.
-            </p>
+            <p className="text-muted-foreground leading-relaxed">{t("mission.text")}</p>
           </motion.div>
 
           <motion.div
@@ -90,12 +89,9 @@ const Index = () => {
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Eye size={20} className="text-primary" />
               </div>
-              <h2 className="text-2xl font-bold text-foreground">Our Vision</h2>
+              <h2 className="text-2xl font-bold text-foreground">{t("vision.title")}</h2>
             </div>
-            <p className="text-muted-foreground leading-relaxed">
-              A Pakistan where no family goes to bed hungry, where every deserving individual has access to
-              basic necessities, and where charity is a way of life guided by Islamic values of empathy and service.
-            </p>
+            <p className="text-muted-foreground leading-relaxed">{t("vision.text")}</p>
           </motion.div>
         </div>
       </section>
@@ -108,16 +104,10 @@ const Index = () => {
           viewport={{ once: true }}
           className="container mx-auto max-w-3xl text-center"
         >
-          <h2 className="text-3xl font-bold text-foreground mb-6">About KAAVIISH</h2>
-          <p className="text-muted-foreground leading-relaxed text-lg mb-8">
-            Founded with a deep commitment to Islamic philanthropy, KAAVIISH is a non-profit foundation
-            based in Pakistan. We organize ration drives, provide emergency relief, and support families
-            in overcoming poverty with dignity and respect.
-          </p>
+          <h2 className="text-3xl font-bold text-foreground mb-6">{t("about.title")}</h2>
+          <p className="text-muted-foreground leading-relaxed text-lg mb-8">{t("about.text")}</p>
           <Link to="/drives">
-            <Button variant="heroOutline" size="lg">
-              View Our Drives →
-            </Button>
+            <Button variant="heroOutline" size="lg">{t("about.cta")}</Button>
           </Link>
         </motion.div>
       </section>

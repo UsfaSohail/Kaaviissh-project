@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Calendar } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const posts = [
   { id: 1, title: "Our Biggest Ration Drive Yet", date: "Feb 15, 2026", preview: "Over 500 families received essential food packages in our latest drive across Lahore." },
@@ -11,12 +12,14 @@ const posts = [
 ];
 
 const Blog = () => {
+  const { t } = useLanguage();
+
   return (
     <div className="pt-24 pb-16 px-4">
       <div className="container mx-auto max-w-5xl">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-3">Blog</h1>
-          <p className="text-muted-foreground text-lg">Stories, updates, and reflections from our journey.</p>
+          <h1 className="text-4xl font-bold text-foreground mb-3">{t("blog.title")}</h1>
+          <p className="text-muted-foreground text-lg">{t("blog.subtitle")}</p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -32,11 +35,9 @@ const Blog = () => {
                 <Calendar size={12} className="text-primary" />
                 {post.date}
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                {post.title}
-              </h3>
+              <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">{post.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-4">{post.preview}</p>
-              <span className="text-sm text-primary font-medium">Read More →</span>
+              <span className="text-sm text-primary font-medium">{t("blog.readmore")}</span>
             </motion.article>
           ))}
         </div>
