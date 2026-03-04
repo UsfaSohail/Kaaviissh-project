@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { MapPin, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type CaseStatus = "all" | "open" | "in-progress" | "completed";
 
@@ -21,26 +22,26 @@ const statusConfig = {
   open: { label: "Open", color: "bg-blue-500/20 text-blue-400" },
 };
 
-const filters: { label: string; value: CaseStatus }[] = [
-  { label: "All", value: "all" },
-  { label: "Open", value: "open" },
-  { label: "In Progress", value: "in-progress" },
-  { label: "Completed", value: "completed" },
-];
-
 const Drives = () => {
   const [filter, setFilter] = useState<CaseStatus>("all");
+  const { t } = useLanguage();
   const filtered = filter === "all" ? cases : cases.filter((c) => c.status === filter);
+
+  const filters: { label: string; value: CaseStatus }[] = [
+    { label: t("drives.all"), value: "all" },
+    { label: t("drives.open"), value: "open" },
+    { label: t("drives.inprogress"), value: "in-progress" },
+    { label: t("drives.completed"), value: "completed" },
+  ];
 
   return (
     <div className="pt-24 pb-16 px-4">
       <div className="container mx-auto max-w-6xl">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-3">Drives & Cases</h1>
-          <p className="text-muted-foreground text-lg">Support ongoing missions or contribute to a specific cause.</p>
+          <h1 className="text-4xl font-bold text-foreground mb-3">{t("drives.title")}</h1>
+          <p className="text-muted-foreground text-lg">{t("drives.subtitle")}</p>
         </motion.div>
 
-        {/* Filters */}
         <div className="flex justify-center gap-2 mb-10 flex-wrap">
           {filters.map((f) => (
             <button
@@ -57,7 +58,6 @@ const Drives = () => {
           ))}
         </div>
 
-        {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((c, i) => {
             const progress = Math.round((c.raised / c.target) * 100);
@@ -70,11 +70,11 @@ const Drives = () => {
                 transition={{ delay: i * 0.05 }}
                 className="bg-card rounded-2xl border border-border p-6 relative overflow-hidden group hover:border-primary/30 transition-colors"
               >
-                <span className={`absolute top-4 right-4 text-xs px-3 py-1 rounded-full font-medium ${cfg.color}`}>
+                <span className={`absolute top-4 ${filter === "all" ? "end-4" : "end-4"} text-xs px-3 py-1 rounded-full font-medium ${cfg.color}`}>
                   {cfg.label}
                 </span>
 
-                <h3 className="text-lg font-semibold text-foreground mb-2 pr-24">{c.title}</h3>
+                <h3 className="text-lg font-semibold text-foreground mb-2 pe-24">{c.title}</h3>
                 <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{c.description}</p>
 
                 <div className="flex items-center gap-1 text-xs text-muted-foreground mb-4">
@@ -90,11 +90,7 @@ const Drives = () => {
                   <div className="h-2 bg-secondary rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
-                        c.status === "completed"
-                          ? "bg-primary"
-                          : c.status === "in-progress"
-                          ? "bg-yellow-400"
-                          : "bg-blue-400 bg-[length:20px_20px] bg-[linear-gradient(45deg,rgba(255,255,255,.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,.15)_50%,rgba(255,255,255,.15)_75%,transparent_75%,transparent)]"
+                        c.status === "completed" ? "bg-primary" : c.status === "in-progress" ? "bg-yellow-400" : "bg-blue-400"
                       }`}
                       style={{ width: `${progress}%` }}
                     />
@@ -103,7 +99,7 @@ const Drives = () => {
 
                 <Link to="/donate">
                   <Button variant="hero" size="sm" className="w-full text-sm py-2 px-4">
-                    <Heart size={14} /> Donate Now
+                    <Heart size={14} /> {t("drives.donatenow")}
                   </Button>
                 </Link>
               </motion.div>

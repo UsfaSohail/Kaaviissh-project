@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Calculator, TrendingDown, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const ZakatCalculator = () => {
-  // Simulated rates (would be fetched from API)
-  const goldRate = 21500; // PKR per gram
-  const silverRate = 265; // PKR per gram
-  const nisabSilver = 612.36; // grams
+  const { t } = useLanguage();
+  const goldRate = 21500;
+  const silverRate = 265;
+  const nisabSilver = 612.36;
   const nisabValue = nisabSilver * silverRate;
 
   const [assets, setAssets] = useState({ cash: "", loans: "", investments: "", trade: "" });
@@ -18,15 +19,10 @@ const ZakatCalculator = () => {
 
   const totalAssets = useMemo(() => {
     const a = Object.values(assets).reduce((s, v) => s + (Number(v) || 0), 0);
-    const g = (Number(gold) || 0) * goldRate;
-    const sv = (Number(silver) || 0) * silverRate;
-    return a + g + sv;
+    return a + (Number(gold) || 0) * goldRate + (Number(silver) || 0) * silverRate;
   }, [assets, gold, silver]);
 
-  const totalLiabilities = useMemo(() =>
-    Object.values(liabilities).reduce((s, v) => s + (Number(v) || 0), 0)
-  , [liabilities]);
-
+  const totalLiabilities = useMemo(() => Object.values(liabilities).reduce((s, v) => s + (Number(v) || 0), 0), [liabilities]);
   const netWorth = totalAssets - totalLiabilities;
   const zakatPayable = netWorth > nisabValue ? netWorth * 0.025 : 0;
   const aboveNisab = netWorth >= nisabValue;
@@ -34,13 +30,7 @@ const ZakatCalculator = () => {
   const InputField = ({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) => (
     <div>
       <label className="text-xs text-muted-foreground mb-1 block">{label}</label>
-      <input
-        type="number"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="0"
-        className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-      />
+      <input type="number" value={value} onChange={(e) => onChange(e.target.value)} placeholder="0" className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm" />
     </div>
   );
 
@@ -48,11 +38,10 @@ const ZakatCalculator = () => {
     <div className="pt-24 pb-16 px-4">
       <div className="container mx-auto max-w-3xl">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-foreground mb-3">Zakat Calculator</h1>
-          <p className="text-muted-foreground">Calculate your Zakat obligation with live gold & silver rates.</p>
+          <h1 className="text-4xl font-bold text-foreground mb-3">{t("zakat.title")}</h1>
+          <p className="text-muted-foreground">{t("zakat.subtitle")}</p>
         </motion.div>
 
-        {/* Rates */}
         <div className="grid grid-cols-2 gap-4 mb-8">
           <div className="bg-card border border-border rounded-2xl p-5 text-center">
             <p className="text-xs text-muted-foreground mb-1">Gold Rate / gram</p>
@@ -63,12 +52,10 @@ const ZakatCalculator = () => {
             <p className="text-xl font-bold text-foreground">Rs. {silverRate.toLocaleString()}</p>
           </div>
         </div>
-        <p className="text-xs text-muted-foreground text-center mb-8">Updated on: March 3, 2026</p>
 
-        {/* Assets */}
         <div className="bg-card border border-border rounded-2xl p-6 mb-6">
           <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-            <TrendingUp size={18} className="text-primary" /> Assets
+            <TrendingUp size={18} className="text-primary" /> {t("zakat.assets")}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <InputField label="Cash in Hand / Bank (PKR)" value={assets.cash} onChange={(v) => setAssets({ ...assets, cash: v })} />
@@ -78,31 +65,25 @@ const ZakatCalculator = () => {
           </div>
         </div>
 
-        {/* Gold & Silver */}
         <div className="bg-card border border-border rounded-2xl p-6 mb-6">
           <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-            <Calculator size={18} className="text-primary" /> Gold & Silver
+            <Calculator size={18} className="text-primary" /> {t("zakat.goldsilver")}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <InputField label="Gold (grams)" value={gold} onChange={setGold} />
-              {Number(gold) > 0 && (
-                <p className="text-xs text-primary mt-1">= Rs. {((Number(gold) || 0) * goldRate).toLocaleString()}</p>
-              )}
+              {Number(gold) > 0 && <p className="text-xs text-primary mt-1">= Rs. {((Number(gold) || 0) * goldRate).toLocaleString()}</p>}
             </div>
             <div>
               <InputField label="Silver (grams)" value={silver} onChange={setSilver} />
-              {Number(silver) > 0 && (
-                <p className="text-xs text-primary mt-1">= Rs. {((Number(silver) || 0) * silverRate).toLocaleString()}</p>
-              )}
+              {Number(silver) > 0 && <p className="text-xs text-primary mt-1">= Rs. {((Number(silver) || 0) * silverRate).toLocaleString()}</p>}
             </div>
           </div>
         </div>
 
-        {/* Liabilities */}
         <div className="bg-card border border-border rounded-2xl p-6 mb-8">
           <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-            <TrendingDown size={18} className="text-destructive" /> Liabilities
+            <TrendingDown size={18} className="text-destructive" /> {t("zakat.liabilities")}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <InputField label="Borrowed Money" value={liabilities.borrowed} onChange={(v) => setLiabilities({ ...liabilities, borrowed: v })} />
@@ -111,40 +92,25 @@ const ZakatCalculator = () => {
           </div>
         </div>
 
-        {/* Result */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-card border-2 border-primary/30 rounded-2xl p-8 text-center"
-        >
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-card border-2 border-primary/30 rounded-2xl p-8 text-center">
           <div className="grid grid-cols-2 gap-6 mb-6">
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Total Net Worth</p>
+              <p className="text-xs text-muted-foreground mb-1">{t("zakat.networth")}</p>
               <p className="text-2xl font-bold text-foreground">Rs. {Math.max(0, netWorth).toLocaleString()}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Zakat Payable (2.5%)</p>
+              <p className="text-xs text-muted-foreground mb-1">{t("zakat.payable")}</p>
               <p className="text-2xl font-bold text-primary">Rs. {zakatPayable.toLocaleString()}</p>
             </div>
           </div>
-
           <p className={`text-sm font-medium mb-6 ${aboveNisab ? "text-primary" : "text-muted-foreground"}`}>
-            {aboveNisab
-              ? "✅ You are above the Nisab threshold. Zakat is obligatory."
-              : "You are below the Nisab threshold. Zakat is not obligatory."}
+            {aboveNisab ? t("zakat.above") : t("zakat.below")}
           </p>
-
-          <p className="text-xs text-muted-foreground italic mb-6">
-            Nisab based on {nisabSilver}g Silver = Rs. {nisabValue.toLocaleString()}
-          </p>
-
+          <p className="text-xs text-muted-foreground italic mb-6">Nisab based on {nisabSilver}g Silver = Rs. {nisabValue.toLocaleString()}</p>
           {zakatPayable > 0 && (
-            <>
-              <p className="text-sm text-muted-foreground italic mb-4">"May your Zakat purify your wealth."</p>
-              <Link to="/donate">
-                <Button variant="hero">Donate Your Zakat</Button>
-              </Link>
-            </>
+            <Link to="/donate">
+              <Button variant="hero">{t("zakat.donatezakat")}</Button>
+            </Link>
           )}
         </motion.div>
       </div>

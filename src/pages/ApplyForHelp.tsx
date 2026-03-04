@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const ApplyForHelp = () => {
   const [submitted, setSubmitted] = useState(false);
+  const { t } = useLanguage();
   const [form, setForm] = useState({
     name: "", cnic: "", phone: "", address: "", city: "", income: "", details: "",
   });
@@ -31,8 +33,8 @@ const ApplyForHelp = () => {
           <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
             <Check size={32} className="text-primary" />
           </div>
-          <h2 className="text-2xl font-bold text-foreground mb-3">Application Submitted</h2>
-          <p className="text-muted-foreground">Your application has been received. Our team will review it and get back to you shortly, InshAllah.</p>
+          <h2 className="text-2xl font-bold text-foreground mb-3">{t("apply.submitted")}</h2>
+          <p className="text-muted-foreground">{t("apply.submittedMsg")}</p>
         </motion.div>
       </div>
     );
@@ -42,8 +44,8 @@ const ApplyForHelp = () => {
     <div className="pt-24 pb-16 px-4">
       <div className="container mx-auto max-w-lg">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-foreground mb-3">Apply for Help</h1>
-          <p className="text-muted-foreground">If you or your family need assistance, please fill out this form. Login is required.</p>
+          <h1 className="text-4xl font-bold text-foreground mb-3">{t("apply.title")}</h1>
+          <p className="text-muted-foreground">{t("apply.subtitle")}</p>
         </motion.div>
 
         <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
@@ -70,7 +72,7 @@ const ApplyForHelp = () => {
           </div>
 
           <Button variant="hero" className="w-full mt-4" onClick={() => setSubmitted(true)}>
-            Submit Application
+            {t("apply.submit")}
           </Button>
         </div>
       </div>

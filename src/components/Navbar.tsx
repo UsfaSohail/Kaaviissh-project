@@ -1,35 +1,39 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Globe } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
-const navLinks = [
-  { label: "Home", path: "/" },
-  { label: "Drives", path: "/drives" },
-  { label: "Zakat Calculator", path: "/zakat" },
-  { label: "Apply for Help", path: "/apply" },
-  { label: "Blog", path: "/blog" },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const { t, lang, setLang } = useLanguage();
+
+  const navLinks = [
+    { label: t("nav.home"), path: "/" },
+    { label: t("nav.drives"), path: "/drives" },
+    { label: t("nav.zakat"), path: "/zakat" },
+    { label: t("nav.apply"), path: "/apply" },
+    { label: t("nav.courses"), path: "/courses" },
+    { label: t("nav.blog"), path: "/blog" },
+  ];
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
-        <Link to="/" className="text-xl font-bold tracking-wider text-foreground">
-          KAAVIISH
+        <Link to="/" className="flex items-center gap-2">
+          <span className="text-xl font-bold tracking-wider text-foreground">KAAVIISH</span>
+          <span className="text-lg font-bold text-primary" style={{ fontFamily: "'Noto Nastaliq Urdu', serif" }}>کاویش</span>
         </Link>
 
         {/* Desktop */}
-        <div className="hidden md:flex items-center gap-1">
+        <div className="hidden lg:flex items-center gap-1">
           {navLinks.map((link) => (
             <Link
               key={link.path}
               to={link.path}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 location.pathname === link.path
                   ? "text-primary bg-primary/10"
                   : "text-muted-foreground hover:text-foreground"
@@ -40,16 +44,28 @@ const Navbar = () => {
           ))}
         </div>
 
-        <div className="hidden md:block">
+        <div className="hidden lg:flex items-center gap-2">
+          <button
+            onClick={() => setLang(lang === "en" ? "ur" : "en")}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Globe size={16} />
+            {lang === "en" ? "اردو" : "English"}
+          </button>
+          <Link to="/login">
+            <Button variant="ghost" size="sm" className="text-sm">
+              {t("nav.login")}
+            </Button>
+          </Link>
           <Link to="/donate">
             <Button variant="hero" size="sm" className="px-6 py-2 text-sm">
-              Donate Now
+              {t("nav.donate")}
             </Button>
           </Link>
         </div>
 
         {/* Mobile toggle */}
-        <button className="md:hidden text-foreground" onClick={() => setOpen(!open)}>
+        <button className="lg:hidden text-foreground" onClick={() => setOpen(!open)}>
           {open ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
@@ -61,7 +77,7 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-background border-b border-border"
+            className="lg:hidden bg-background border-b border-border"
           >
             <div className="flex flex-col p-4 gap-2">
               {navLinks.map((link) => (
@@ -78,9 +94,21 @@ const Navbar = () => {
                   {link.label}
                 </Link>
               ))}
+              <button
+                onClick={() => { setLang(lang === "en" ? "ur" : "en"); }}
+                className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Globe size={16} />
+                {lang === "en" ? "اردو" : "English"}
+              </button>
+              <Link to="/login" onClick={() => setOpen(false)}>
+                <Button variant="ghost" className="w-full mt-1 py-3 text-sm">
+                  {t("nav.login")}
+                </Button>
+              </Link>
               <Link to="/donate" onClick={() => setOpen(false)}>
-                <Button variant="hero" className="w-full mt-2 py-3 text-sm">
-                  Donate Now
+                <Button variant="hero" className="w-full mt-1 py-3 text-sm">
+                  {t("nav.donate")}
                 </Button>
               </Link>
             </div>
