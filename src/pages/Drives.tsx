@@ -149,16 +149,16 @@ const Drives = () => {
                   </div>
                 </div>
 
-                {c.status !== "completed" && (
-                  <Button
-                    variant="hero"
-                    size="sm"
-                    className="w-full text-sm py-2 px-4"
-                    onClick={() => setDonateCase(c.title)}
-                  >
-                    <Heart size={14} /> {t("drives.donatenow")}
-                  </Button>
-                )}
+                <Button
+                  variant="hero"
+                  size="sm"
+                  className={`w-full text-sm py-2 px-4 ${c.status === "completed" ? "opacity-50 cursor-not-allowed" : ""}`}
+                  onClick={() => c.status !== "completed" && setDonateCase(c.title)}
+                  disabled={c.status === "completed"}
+                  style={c.status === "completed" ? { cursor: "not-allowed" } : {}}
+                >
+                  <Heart size={14} /> {t("drives.donatenow")}
+                </Button>
               </motion.div>
             );
           })}

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Mail, Instagram } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import logo from "@/assets/kaaviissh-logo.jpeg";
 
@@ -15,7 +15,7 @@ const Footer = () => {
               <img src={logo} alt="KAAVIISSH Foundation Logo" className="h-12 w-12 rounded-lg object-cover" />
               <div>
                 <h3 className="text-xl font-bold text-foreground tracking-wider">KAAVIISSH</h3>
-                <span className="text-sm font-bold text-primary" style={{ fontFamily: "'Noto Nastaliq Urdu', serif" }}>کاویش</span>
+                <span className="text-sm font-bold text-primary" style={{ fontFamily: "'Noto Nastaliq Urdu', serif" }}>کاوش</span>
               </div>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
@@ -28,16 +28,12 @@ const Footer = () => {
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Mail size={14} className="text-primary" />
-                info@kaaviissh.org
+                kaaviissh@gmail.com
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Phone size={14} className="text-primary" />
-                +92 300 1234567
-              </div>
-              <div className="flex items-start gap-2 text-sm text-muted-foreground">
-                <MapPin size={14} className="text-primary mt-0.5" />
-                Lahore, Pakistan
-              </div>
+              <a href="https://instagram.com/kaaviissh" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+                <Instagram size={14} className="text-primary" />
+                @kaaviissh
+              </a>
             </div>
           </div>
 
