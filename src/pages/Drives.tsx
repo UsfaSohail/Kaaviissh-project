@@ -2,18 +2,66 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { MapPin, Heart } from "lucide-react";
-import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import DonateModal from "@/components/DonateModal";
 
 type CaseStatus = "all" | "open" | "in-progress" | "completed";
 
 const cases = [
-  { id: 1, title: "Ration Drive – Lahore", description: "Monthly ration distribution for 200 families in underserved areas of Lahore.", location: "Lahore", target: 500000, raised: 500000, status: "completed" as const },
-  { id: 2, title: "Winter Relief – Quetta", description: "Warm clothing and blankets for families facing harsh winter conditions.", location: "Quetta", target: 300000, raised: 165000, status: "in-progress" as const },
-  { id: 3, title: "Flood Relief – Sindh", description: "Emergency food and medical supplies for flood-affected communities.", location: "Sindh", target: 800000, raised: 0, status: "open" as const },
-  { id: 4, title: "Ramadan Food Packs", description: "Special Ramadan food packages for families during the holy month.", location: "Karachi", target: 400000, raised: 400000, status: "completed" as const },
-  { id: 5, title: "Education Support – KPK", description: "School supplies and uniforms for children in remote KPK villages.", location: "Peshawar", target: 250000, raised: 87500, status: "in-progress" as const },
-  { id: 6, title: "Clean Water – Thar", description: "Installing water filtration plants in drought-stricken areas of Tharparkar.", location: "Thar", target: 600000, raised: 0, status: "open" as const },
+  {
+    id: 1,
+    title: "Ramadan Drive",
+    description: "Distribute cash envelopes of Rs. 5k–6k to 12+ families for customized needs.",
+    location: "Lahore",
+    target: 70000,
+    raised: 20000,
+    status: "open" as const,
+  },
+  {
+    id: 2,
+    title: "Medical: DVT Surgery",
+    description: "Life-saving surgery for a young mother of two diagnosed with Deep Vein Thrombosis.",
+    location: "Lahore",
+    target: 27000,
+    raised: 0,
+    status: "open" as const,
+  },
+  {
+    id: 3,
+    title: "ICU Support",
+    description: "Assistance for hospital expenditures for a man previously in critical condition.",
+    location: "Lahore",
+    target: 50000,
+    raised: 50000,
+    status: "completed" as const,
+  },
+  {
+    id: 4,
+    title: "Ration & Rent",
+    description: "Supporting a family with an unemployed head for rent, food, and baby milk.",
+    location: "Lahore",
+    target: 35000,
+    raised: 0,
+    status: "open" as const,
+  },
+  {
+    id: 5,
+    title: "Stray Cat Welfare",
+    description: "Community-led initiative for feeding and medical care of local stray cats.",
+    location: "Lahore",
+    target: 15000,
+    raised: 2500,
+    status: "in-progress" as const,
+  },
+  {
+    id: 6,
+    title: "Bulk Ration Bags",
+    description: "Distribution of comprehensive ration bags valued at Rs. 10,000 each.",
+    location: "Lahore",
+    target: 100000,
+    raised: 0,
+    status: "open" as const,
+  },
 ];
 
 const statusConfig = {
@@ -24,6 +72,7 @@ const statusConfig = {
 
 const Drives = () => {
   const [filter, setFilter] = useState<CaseStatus>("all");
+  const [donateCase, setDonateCase] = useState<string | null>(null);
   const { t } = useLanguage();
   const filtered = filter === "all" ? cases : cases.filter((c) => c.status === filter);
 
@@ -68,9 +117,12 @@ const Drives = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="bg-card rounded-2xl border border-border p-6 relative overflow-hidden group hover:border-primary/30 transition-colors"
+                className="bg-card rounded-2xl border border-border p-6 relative overflow-hidden group
+                  transition-all duration-300 ease-out
+                  hover:-translate-y-2 hover:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.5)]
+                  hover:border-l-4 hover:border-l-primary hover:border-t-border hover:border-r-border hover:border-b-border"
               >
-                <span className={`absolute top-4 ${filter === "all" ? "end-4" : "end-4"} text-xs px-3 py-1 rounded-full font-medium ${cfg.color}`}>
+                <span className={`absolute top-4 end-4 text-xs px-3 py-1 rounded-full font-medium transition-transform duration-300 group-hover:scale-110 ${cfg.color}`}>
                   {cfg.label}
                 </span>
 
@@ -97,16 +149,27 @@ const Drives = () => {
                   </div>
                 </div>
 
-                <Link to="/donate">
-                  <Button variant="hero" size="sm" className="w-full text-sm py-2 px-4">
+                {c.status !== "completed" && (
+                  <Button
+                    variant="hero"
+                    size="sm"
+                    className="w-full text-sm py-2 px-4"
+                    onClick={() => setDonateCase(c.title)}
+                  >
                     <Heart size={14} /> {t("drives.donatenow")}
                   </Button>
-                </Link>
+                )}
               </motion.div>
             );
           })}
         </div>
       </div>
+
+      <DonateModal
+        caseName={donateCase || ""}
+        open={!!donateCase}
+        onClose={() => setDonateCase(null)}
+      />
     </div>
   );
 };

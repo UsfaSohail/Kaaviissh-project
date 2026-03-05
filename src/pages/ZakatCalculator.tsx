@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Calculator, TrendingDown, TrendingUp } from "lucide-react";
+import { Calculator, TrendingDown, TrendingUp, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -42,7 +42,7 @@ const ZakatCalculator = () => {
           <p className="text-muted-foreground">{t("zakat.subtitle")}</p>
         </motion.div>
 
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-2 gap-4 mb-3">
           <div className="bg-card border border-border rounded-2xl p-5 text-center">
             <p className="text-xs text-muted-foreground mb-1">Gold Rate / gram</p>
             <p className="text-xl font-bold text-foreground">Rs. {goldRate.toLocaleString()}</p>
@@ -51,6 +51,14 @@ const ZakatCalculator = () => {
             <p className="text-xs text-muted-foreground mb-1">Silver Rate / gram</p>
             <p className="text-xl font-bold text-foreground">Rs. {silverRate.toLocaleString()}</p>
           </div>
+        </div>
+
+        {/* Rate verification notice */}
+        <div className="flex items-center justify-center gap-2 mb-8 px-4 py-2.5 rounded-xl bg-primary/5 border border-primary/20">
+          <ShieldCheck size={16} className="text-primary flex-shrink-0" />
+          <p className="text-xs text-primary font-medium">
+            Rates are verified against market sources and updated daily.
+          </p>
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-6 mb-6">

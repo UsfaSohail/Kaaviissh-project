@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import logo from "@/assets/kaaviissh-logo.jpeg";
 
 const Footer = () => {
   const { t } = useLanguage();
@@ -8,11 +9,14 @@ const Footer = () => {
   return (
     <footer className="bg-card border-t border-border">
       <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <h3 className="text-xl font-bold text-foreground tracking-wider">KAAVIISH</h3>
-              <span className="text-lg font-bold text-primary" style={{ fontFamily: "'Noto Nastaliq Urdu', serif" }}>کاویش</span>
+            <div className="flex items-center gap-3">
+              <img src={logo} alt="KAAVIISSH Foundation Logo" className="h-12 w-12 rounded-lg object-cover" />
+              <div>
+                <h3 className="text-xl font-bold text-foreground tracking-wider">KAAVIISSH</h3>
+                <span className="text-sm font-bold text-primary" style={{ fontFamily: "'Noto Nastaliq Urdu', serif" }}>کاویش</span>
+              </div>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
               {t("footer.tagline")}
@@ -20,29 +24,11 @@ const Footer = () => {
           </div>
 
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider">{t("footer.quicklinks")}</h4>
-            <div className="flex flex-col gap-2">
-              {[
-                { label: t("nav.home"), path: "/" },
-                { label: t("nav.drives"), path: "/drives" },
-                { label: t("nav.donate"), path: "/donate" },
-                { label: t("nav.zakat"), path: "/zakat" },
-                { label: t("nav.courses"), path: "/courses" },
-                { label: t("nav.blog"), path: "/blog" },
-              ].map((l) => (
-                <Link key={l.path} to={l.path} className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  {l.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-4">
             <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider">{t("footer.contact")}</h4>
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Mail size={14} className="text-primary" />
-                info@kaaviish.org
+                info@kaaviissh.org
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Phone size={14} className="text-primary" />

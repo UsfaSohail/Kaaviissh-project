@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, Globe } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
+import logo from "@/assets/kaaviissh-logo.jpeg";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -23,7 +24,8 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <Link to="/" className="flex items-center gap-2">
-          <span className="text-xl font-bold tracking-wider text-foreground">KAAVIISH</span>
+          <img src={logo} alt="KAAVIISSH Foundation Logo" className="h-9 w-9 rounded-lg object-cover" />
+          <span className="text-xl font-bold tracking-wider text-foreground">KAAVIISSH</span>
           <span className="text-lg font-bold text-primary" style={{ fontFamily: "'Noto Nastaliq Urdu', serif" }}>کاویش</span>
         </Link>
 
