@@ -32,13 +32,13 @@ const translations: Record<string, Record<Lang, string>> = {
 
   // Mission
   "mission.title": { en: "Our Mission", ur: "ہمارا مشن" },
-  "mission.text": { en: "KAAVIISH is dedicated to uplifting underprivileged communities across Pakistan through ration drives, financial assistance, and sustained welfare programs. We bridge the gap between those who can give and those in dire need, ensuring every contribution reaches the right hands.", ur: "کاویش پاکستان بھر میں پسماندہ کمیونٹیز کی ترقی کے لیے وقف ہے — راشن ڈرائیوز، مالی امداد، اور مسلسل فلاحی پروگرامز کے ذریعے۔" },
+  "mission.text": { en: "KAAVIISSH is dedicated to uplifting underprivileged communities across Pakistan through ration drives, financial assistance, and sustained welfare programs. We bridge the gap between those who can give and those in dire need, ensuring every contribution reaches the right hands.", ur: "کاوش پاکستان بھر میں پسماندہ کمیونٹیز کی ترقی کے لیے وقف ہے — راشن ڈرائیوز، مالی امداد، اور مسلسل فلاحی پروگرامز کے ذریعے۔" },
   "vision.title": { en: "Our Vision", ur: "ہمارا وژن" },
   "vision.text": { en: "A Pakistan where no family goes to bed hungry, where every deserving individual has access to basic necessities, and where charity is a way of life guided by Islamic values of empathy and service.", ur: "ایک ایسا پاکستان جہاں کوئی خاندان بھوکا نہ سوئے، جہاں ہر مستحق کو بنیادی ضروریات میسر ہوں۔" },
 
   // About
-  "about.title": { en: "About KAAVIISH", ur: "کاویش کے بارے میں" },
-  "about.text": { en: "Founded with a deep commitment to Islamic philanthropy, KAAVIISH is a non-profit foundation based in Pakistan. We organize ration drives, provide emergency relief, and support families in overcoming poverty with dignity and respect.", ur: "اسلامی فلاح و بہبود سے گہری وابستگی کے ساتھ قائم کیا گیا، کاویش پاکستان میں قائم ایک غیر منافع بخش فاؤنڈیشن ہے۔" },
+  "about.title": { en: "About KAAVIISSH", ur: "کاوش کے بارے میں" },
+  "about.text": { en: "Founded with a deep commitment to Islamic philanthropy, KAAVIISSH is a non-profit foundation based in Pakistan. We organize ration drives, provide emergency relief, and support families in overcoming poverty with dignity and respect.", ur: "اسلامی فلاح و بہبود سے گہری وابستگی کے ساتھ قائم کیا گیا، کاوش پاکستان میں قائم ایک غیر منافع بخش فاؤنڈیشن ہے۔" },
   "about.cta": { en: "View Our Drives →", ur: "ہماری مہمات دیکھیں →" },
 
   // Drives
@@ -112,7 +112,7 @@ const translations: Record<string, Record<Lang, string>> = {
   "footer.legal": { en: "Legal", ur: "قانونی" },
   "footer.privacy": { en: "Privacy Policy", ur: "رازداری کی پالیسی" },
   "footer.terms": { en: "Terms of Service", ur: "شرائط و ضوابط" },
-  "footer.rights": { en: "© 2026 KAAVIISH Foundation. All rights reserved.", ur: "© 2026 کاویش فاؤنڈیشن۔ جملہ حقوق محفوظ ہیں۔" },
+  "footer.rights": { en: "© 2024 KAAVIISSH Foundation. All rights reserved.", ur: "© 2024 کاوش فاؤنڈیشن۔ جملہ حقوق محفوظ ہیں۔" },
 };
 
 const LanguageContext = createContext<LanguageContextType | null>(null);

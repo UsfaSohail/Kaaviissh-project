@@ -26,7 +26,7 @@ const Navbar = () => {
         <Link to="/" className="flex items-center gap-2">
           <img src={logo} alt="KAAVIISSH Foundation Logo" className="h-9 w-9 rounded-lg object-cover" />
           <span className="text-xl font-bold tracking-wider text-foreground">KAAVIISSH</span>
-          <span className="text-lg font-bold text-primary" style={{ fontFamily: "'Noto Nastaliq Urdu', serif" }}>کاویش</span>
+          <span className="text-lg font-bold text-primary" style={{ fontFamily: "'Noto Nastaliq Urdu', serif" }}>کاوش</span>
         </Link>
 
         {/* Desktop */}
