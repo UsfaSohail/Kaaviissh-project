@@ -1,15 +1,18 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Globe } from "lucide-react";
+import { Menu, X, Globe, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
 import logo from "@/assets/kaaviissh-logo.jpeg";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { t, lang, setLang } = useLanguage();
+  const { user, signOut, isAdmin } = useAuth();
 
   const navLinks = [
     { label: t("nav.home"), path: "/" },
@@ -19,6 +22,11 @@ const Navbar = () => {
     { label: t("nav.courses"), path: "/courses" },
     { label: t("nav.blog"), path: "/blog" },
   ];
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
@@ -54,11 +62,21 @@ const Navbar = () => {
             <Globe size={16} />
             {lang === "en" ? "اردو" : "English"}
           </button>
-          <Link to="/login">
-            <Button variant="ghost" size="sm" className="text-sm">
-              {t("nav.login")}
-            </Button>
-          </Link>
+          {user ? (
+            <button
+              onClick={handleSignOut}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <LogOut size={16} />
+              Logout
+            </button>
+          ) : (
+            <Link to="/login">
+              <Button variant="ghost" size="sm" className="text-sm">
+                {t("nav.login")}
+              </Button>
+            </Link>
+          )}
           <Link to="/donate">
             <Button variant="hero" size="sm" className="px-6 py-2 text-sm">
               {t("nav.donate")}
@@ -103,11 +121,17 @@ const Navbar = () => {
                 <Globe size={16} />
                 {lang === "en" ? "اردو" : "English"}
               </button>
-              <Link to="/login" onClick={() => setOpen(false)}>
-                <Button variant="ghost" className="w-full mt-1 py-3 text-sm">
-                  {t("nav.login")}
+              {user ? (
+                <Button variant="ghost" className="w-full mt-1 py-3 text-sm" onClick={() => { handleSignOut(); setOpen(false); }}>
+                  <LogOut size={16} className="mr-2" /> Logout
                 </Button>
-              </Link>
+              ) : (
+                <Link to="/login" onClick={() => setOpen(false)}>
+                  <Button variant="ghost" className="w-full mt-1 py-3 text-sm">
+                    {t("nav.login")}
+                  </Button>
+                </Link>
+              )}
               <Link to="/donate" onClick={() => setOpen(false)}>
                 <Button variant="hero" className="w-full mt-1 py-3 text-sm">
                   {t("nav.donate")}
