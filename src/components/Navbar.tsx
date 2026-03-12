@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Globe, LogOut } from "lucide-react";
+import { Menu, X, Globe, LogOut, Shield } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -37,105 +37,78 @@ const Navbar = () => {
           <span className="text-lg font-bold text-primary" style={{ fontFamily: "'Noto Nastaliq Urdu', serif" }}>کاوش</span>
         </Link>
 
-        {/* Desktop */}
         <div className="hidden lg:flex items-center gap-1">
           {navLinks.map((link) => (
-            <Link
-              key={link.path}
-              to={link.path}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                location.pathname === link.path
-                  ? "text-primary bg-primary/10"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
+            <Link key={link.path} to={link.path} className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${location.pathname === link.path ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"}`}>
               {link.label}
             </Link>
           ))}
         </div>
 
         <div className="hidden lg:flex items-center gap-2">
-          <button
-            onClick={() => setLang(lang === "en" ? "ur" : "en")}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
+          <button onClick={() => setLang(lang === "en" ? "ur" : "en")} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors">
             <Globe size={16} />
             {lang === "en" ? "اردو" : "English"}
           </button>
           {user ? (
-            <button
-              onClick={handleSignOut}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <LogOut size={16} />
-              Logout
-            </button>
+            <>
+              {isAdmin && (
+                <Link to="/admin" className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-primary hover:text-primary/80 transition-colors">
+                  <Shield size={16} />
+                  {t("nav.admin")}
+                </Link>
+              )}
+              <button onClick={handleSignOut} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <LogOut size={16} />
+                {t("nav.logout")}
+              </button>
+            </>
           ) : (
             <Link to="/login">
-              <Button variant="ghost" size="sm" className="text-sm">
-                {t("nav.login")}
-              </Button>
+              <Button variant="ghost" size="sm" className="text-sm">{t("nav.login")}</Button>
             </Link>
           )}
           <Link to="/donate">
-            <Button variant="hero" size="sm" className="px-6 py-2 text-sm">
-              {t("nav.donate")}
-            </Button>
+            <Button variant="hero" size="sm" className="px-6 py-2 text-sm">{t("nav.donate")}</Button>
           </Link>
         </div>
 
-        {/* Mobile toggle */}
         <button className="lg:hidden text-foreground" onClick={() => setOpen(!open)}>
           {open ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {open && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-background border-b border-border"
-          >
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="lg:hidden bg-background border-b border-border">
             <div className="flex flex-col p-4 gap-2">
               {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  onClick={() => setOpen(false)}
-                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                    location.pathname === link.path
-                      ? "text-primary bg-primary/10"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
+                <Link key={link.path} to={link.path} onClick={() => setOpen(false)} className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${location.pathname === link.path ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"}`}>
                   {link.label}
                 </Link>
               ))}
-              <button
-                onClick={() => { setLang(lang === "en" ? "ur" : "en"); }}
-                className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
+              <button onClick={() => setLang(lang === "en" ? "ur" : "en")} className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors">
                 <Globe size={16} />
                 {lang === "en" ? "اردو" : "English"}
               </button>
               {user ? (
-                <Button variant="ghost" className="w-full mt-1 py-3 text-sm" onClick={() => { handleSignOut(); setOpen(false); }}>
-                  <LogOut size={16} className="mr-2" /> Logout
-                </Button>
+                <>
+                  {isAdmin && (
+                    <Link to="/admin" onClick={() => setOpen(false)} className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-primary">
+                      <Shield size={16} /> {t("nav.admin")}
+                    </Link>
+                  )}
+                  <Button variant="ghost" className="w-full mt-1 py-3 text-sm" onClick={() => { handleSignOut(); setOpen(false); }}>
+                    <LogOut size={16} className="mr-2" /> {t("nav.logout")}
+                  </Button>
+                </>
               ) : (
                 <Link to="/login" onClick={() => setOpen(false)}>
-                  <Button variant="ghost" className="w-full mt-1 py-3 text-sm">
-                    {t("nav.login")}
-                  </Button>
+                  <Button variant="ghost" className="w-full mt-1 py-3 text-sm">{t("nav.login")}</Button>
                 </Link>
               )}
               <Link to="/donate" onClick={() => setOpen(false)}>
-                <Button variant="hero" className="w-full mt-1 py-3 text-sm">
-                  {t("nav.donate")}
-                </Button>
+                <Button variant="hero" className="w-full mt-1 py-3 text-sm">{t("nav.donate")}</Button>
               </Link>
             </div>
           </motion.div>

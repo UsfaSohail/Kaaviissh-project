@@ -18,25 +18,17 @@ const Footer = () => {
                 <span className="text-sm font-bold text-primary" style={{ fontFamily: "'Noto Nastaliq Urdu', serif" }}>کاوش</span>
               </div>
             </div>
-            <p className="text-muted-foreground text-sm leading-relaxed">
-              {t("footer.tagline")}
-            </p>
+            <p className="text-muted-foreground text-sm leading-relaxed">{t("footer.tagline")}</p>
           </div>
-
           <div className="space-y-4">
             <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider">{t("footer.contact")}</h4>
             <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Mail size={14} className="text-primary" />
-                kaaviissh@gmail.com
-              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground"><Mail size={14} className="text-primary" /> kaaviissh@gmail.com</div>
               <a href="https://instagram.com/kaaviissh" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
-                <Instagram size={14} className="text-primary" />
-                @kaaviissh
+                <Instagram size={14} className="text-primary" /> @kaaviissh
               </a>
             </div>
           </div>
-
           <div className="space-y-4">
             <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider">{t("footer.legal")}</h4>
             <div className="flex flex-col gap-2">
@@ -45,7 +37,6 @@ const Footer = () => {
             </div>
           </div>
         </div>
-
         <div className="mt-12 pt-8 border-t border-border text-center">
           <p className="text-xs text-muted-foreground">{t("footer.rights")}</p>
         </div>

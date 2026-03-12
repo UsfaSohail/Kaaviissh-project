@@ -3,84 +3,30 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { MapPin, Heart } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useCases } from "@/hooks/useCases";
 import DonateModal from "@/components/DonateModal";
 
-type CaseStatus = "all" | "open" | "in-progress" | "completed";
+type CaseStatus = "all" | "Open" | "In Progress" | "Completed";
 
-const cases = [
-  {
-    id: 1,
-    title: "Ramadan Drive",
-    description: "Distribute cash envelopes of Rs. 5k–6k to 12+ families for customized needs.",
-    location: "Lahore",
-    target: 70000,
-    raised: 20000,
-    status: "open" as const,
-  },
-  {
-    id: 2,
-    title: "Medical: DVT Surgery",
-    description: "Life-saving surgery for a young mother of two diagnosed with Deep Vein Thrombosis.",
-    location: "Lahore",
-    target: 27000,
-    raised: 0,
-    status: "open" as const,
-  },
-  {
-    id: 3,
-    title: "ICU Support",
-    description: "Assistance for hospital expenditures for a man previously in critical condition.",
-    location: "Lahore",
-    target: 50000,
-    raised: 50000,
-    status: "completed" as const,
-  },
-  {
-    id: 4,
-    title: "Ration & Rent",
-    description: "Supporting a family with an unemployed head for rent, food, and baby milk.",
-    location: "Lahore",
-    target: 35000,
-    raised: 0,
-    status: "open" as const,
-  },
-  {
-    id: 5,
-    title: "Stray Cat Welfare",
-    description: "Community-led initiative for feeding and medical care of local stray cats.",
-    location: "Lahore",
-    target: 15000,
-    raised: 2500,
-    status: "in-progress" as const,
-  },
-  {
-    id: 6,
-    title: "Bulk Ration Bags",
-    description: "Distribution of comprehensive ration bags valued at Rs. 10,000 each.",
-    location: "Lahore",
-    target: 100000,
-    raised: 0,
-    status: "open" as const,
-  },
-];
-
-const statusConfig = {
-  completed: { label: "Completed", color: "bg-primary text-primary-foreground" },
-  "in-progress": { label: "In Progress", color: "bg-yellow-500/20 text-yellow-400" },
-  open: { label: "Open", color: "bg-blue-500/20 text-blue-400" },
+const statusConfig: Record<string, { color: string }> = {
+  Completed: { color: "bg-primary/20 text-primary" },
+  "In Progress": { color: "bg-yellow-500/20 text-yellow-400" },
+  Open: { color: "bg-blue-500/20 text-blue-400" },
 };
 
 const Drives = () => {
   const [filter, setFilter] = useState<CaseStatus>("all");
   const [donateCase, setDonateCase] = useState<string | null>(null);
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const { cases, loading } = useCases();
+
   const filtered = filter === "all" ? cases : cases.filter((c) => c.status === filter);
 
   const filters: { label: string; value: CaseStatus }[] = [
     { label: t("drives.all"), value: "all" },
-    { label: t("drives.open"), value: "open" },
-    { label: t("drives.inprogress"), value: "in-progress" },
-    { label: t("drives.completed"), value: "completed" },
+    { label: t("drives.open"), value: "Open" },
+    { label: t("drives.inprogress"), value: "In Progress" },
+    { label: t("drives.completed"), value: "Completed" },
   ];
 
   return (
@@ -93,83 +39,53 @@ const Drives = () => {
 
         <div className="flex justify-center gap-2 mb-10 flex-wrap">
           {filters.map((f) => (
-            <button
-              key={f.value}
-              onClick={() => setFilter(f.value)}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
-                filter === f.value
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card text-muted-foreground hover:text-foreground border border-border"
-              }`}
-            >
+            <button key={f.value} onClick={() => setFilter(f.value)} className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${filter === f.value ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground border border-border"}`}>
               {f.label}
             </button>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((c, i) => {
-            const progress = Math.round((c.raised / c.target) * 100);
-            const cfg = statusConfig[c.status];
-            return (
-              <motion.div
-                key={c.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className="bg-card rounded-2xl border border-border p-6 relative overflow-hidden group
-                  transition-all duration-300 ease-out
-                  hover:-translate-y-2 hover:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.5)]
-                  hover:border-l-4 hover:border-l-primary hover:border-t-border hover:border-r-border hover:border-b-border"
-              >
-                <span className={`absolute top-4 end-4 text-xs px-3 py-1 rounded-full font-medium transition-transform duration-300 group-hover:scale-110 ${cfg.color}`}>
-                  {cfg.label}
-                </span>
-
-                <h3 className="text-lg font-semibold text-foreground mb-2 pe-24">{c.title}</h3>
-                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{c.description}</p>
-
-                <div className="flex items-center gap-1 text-xs text-muted-foreground mb-4">
-                  <MapPin size={12} className="text-primary" />
-                  {c.location}
-                </div>
-
-                <div className="mb-4">
-                  <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
-                    <span>Rs. {c.raised.toLocaleString()}</span>
-                    <span>Rs. {c.target.toLocaleString()}</span>
+        {loading ? (
+          <div className="text-center text-muted-foreground py-12">{t("common.loading")}</div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center text-muted-foreground py-12">{t("drives.noCases")}</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filtered.map((c, i) => {
+              const progress = Number(c.target_amount) > 0 ? Math.round((Number(c.raised_amount) / Number(c.target_amount)) * 100) : 0;
+              const cfg = statusConfig[c.status] || statusConfig.Open;
+              const title = lang === "ur" && c.title_ur ? c.title_ur : c.title_en;
+              const desc = lang === "ur" && c.description_ur ? c.description_ur : c.description_en;
+              return (
+                <motion.div key={c.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="bg-card rounded-2xl border border-border p-6 relative overflow-hidden group transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.5)] hover:border-l-4 hover:border-l-primary">
+                  {c.image_url && <img src={c.image_url} alt={title} className="w-full h-40 object-cover rounded-xl mb-4" />}
+                  <span className={`absolute top-4 end-4 text-xs px-3 py-1 rounded-full font-medium ${cfg.color}`}>{c.status}</span>
+                  <h3 className="text-lg font-semibold text-foreground mb-2 pe-24">{title}</h3>
+                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{desc}</p>
+                  {c.location && (
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground mb-4">
+                      <MapPin size={12} className="text-primary" /> {c.location}
+                    </div>
+                  )}
+                  <div className="mb-4">
+                    <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
+                      <span>Rs. {Number(c.raised_amount).toLocaleString()}</span>
+                      <span>Rs. {Number(c.target_amount).toLocaleString()}</span>
+                    </div>
+                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full transition-all duration-500 ${c.status === "Completed" ? "bg-primary" : c.status === "In Progress" ? "bg-yellow-400" : "bg-blue-400"}`} style={{ width: `${progress}%` }} />
+                    </div>
                   </div>
-                  <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${
-                        c.status === "completed" ? "bg-primary" : c.status === "in-progress" ? "bg-yellow-400" : "bg-blue-400"
-                      }`}
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                </div>
-
-                <Button
-                  variant="hero"
-                  size="sm"
-                  className={`w-full text-sm py-2 px-4 ${c.status === "completed" ? "opacity-50 cursor-not-allowed" : ""}`}
-                  onClick={() => c.status !== "completed" && setDonateCase(c.title)}
-                  disabled={c.status === "completed"}
-                  style={c.status === "completed" ? { cursor: "not-allowed" } : {}}
-                >
-                  <Heart size={14} /> {t("drives.donatenow")}
-                </Button>
-              </motion.div>
-            );
-          })}
-        </div>
+                  <Button variant="hero" size="sm" className={`w-full text-sm py-2 px-4 ${c.status === "Completed" ? "opacity-50 cursor-not-allowed" : ""}`} onClick={() => c.status !== "Completed" && setDonateCase(title)} disabled={c.status === "Completed"}>
+                    <Heart size={14} /> {t("drives.donatenow")}
+                  </Button>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
       </div>
-
-      <DonateModal
-        caseName={donateCase || ""}
-        open={!!donateCase}
-        onClose={() => setDonateCase(null)}
-      />
+      <DonateModal caseName={donateCase || ""} open={!!donateCase} onClose={() => setDonateCase(null)} />
     </div>
   );
 };
