@@ -46,7 +46,7 @@ const App = () => (
             <Routes>
               {/* Admin routes — no Navbar/Footer */}
               <Route path="/admin" element={
-                <ProtectedRoute requireAdmin>
+                <ProtectedRoute adminOnly>
                   <AdminLayout />
                 </ProtectedRoute>
               }>
