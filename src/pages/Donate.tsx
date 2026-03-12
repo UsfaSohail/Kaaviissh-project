@@ -3,12 +3,17 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ArrowLeft, ArrowRight, Upload } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { usePaymentMethods } from "@/hooks/usePaymentMethods";
+import { useDonations } from "@/hooks/useDonations";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
-const donationTypes = ["Ration", "Zakat", "Case Specific", "Custom Amount"];
-const paymentMethods = [
-  { name: "Easypaisa", account: "0300-1234567", color: "bg-green-600" },
-  { name: "JazzCash", account: "0301-7654321", color: "bg-red-500" },
-  { name: "SadaPay", account: "0302-9876543", color: "bg-purple-500" },
+const donationTypes = [
+  { key: "Ration", labelKey: "donate.typeRation" },
+  { key: "Zakat", labelKey: "donate.typeZakat" },
+  { key: "Case Specific", labelKey: "donate.typeCaseSpecific" },
+  { key: "Custom", labelKey: "donate.typeCustom" },
 ];
 
 const steps = ["Type", "Amount", "Payment", "Instructions", "Upload"];
@@ -17,9 +22,16 @@ const Donate = () => {
   const [step, setStep] = useState(0);
   const [type, setType] = useState("");
   const [amount, setAmount] = useState("");
-  const [method, setMethod] = useState<typeof paymentMethods[0] | null>(null);
+  const [method, setMethod] = useState<any>(null);
   const [done, setDone] = useState(false);
+  const [donorName, setDonorName] = useState("");
+  const [donorEmail, setDonorEmail] = useState("");
+  const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
   const { t } = useLanguage();
+  const { methods } = usePaymentMethods(true);
+  const { submitDonation } = useDonations();
+  const { user } = useAuth();
 
   const canNext = () => {
     if (step === 0) return !!type;
@@ -28,13 +40,37 @@ const Donate = () => {
     return true;
   };
 
+  const handleSubmit = async () => {
+    setUploading(true);
+    let screenshotUrl = "";
+    if (screenshotFile) {
+      const ext = screenshotFile.name.split(".").pop();
+      const path = `${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("donation-screenshots").upload(path, screenshotFile);
+      if (!error) {
+        const { data: urlData } = supabase.storage.from("donation-screenshots").getPublicUrl(path);
+        screenshotUrl = urlData.publicUrl;
+      }
+    }
+    await submitDonation({
+      amount: Number(amount),
+      type,
+      payment_method: method?.method_name,
+      donor_name: donorName || null,
+      donor_email: donorEmail || null,
+      screenshot_url: screenshotUrl || null,
+      user_id: user?.id || null,
+    });
+    setUploading(false);
+    setDone(true);
+    toast.success(t("donate.thanks"));
+  };
+
   if (done) {
     return (
       <div className="pt-24 pb-16 px-4 min-h-screen flex items-center justify-center">
         <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center max-w-md">
-          <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
-            <Check size={32} className="text-primary" />
-          </div>
+          <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6"><Check size={32} className="text-primary" /></div>
           <h2 className="text-2xl font-bold text-foreground mb-3">{t("donate.thanks")}</h2>
           <p className="text-muted-foreground italic">{t("donate.thanksMsg")}</p>
         </motion.div>
@@ -51,11 +87,7 @@ const Donate = () => {
         <div className="flex items-center justify-center gap-1 mb-10">
           {steps.map((s, i) => (
             <div key={s} className="flex items-center gap-1">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                i <= step ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"
-              }`}>
-                {i + 1}
-              </div>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${i <= step ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}>{i + 1}</div>
               {i < steps.length - 1 && <div className={`w-6 h-0.5 ${i < step ? "bg-primary" : "bg-secondary"}`} />}
             </div>
           ))}
@@ -67,8 +99,8 @@ const Donate = () => {
               <div className="space-y-3">
                 <h2 className="text-lg font-semibold text-foreground mb-4">{t("donate.choosetype")}</h2>
                 {donationTypes.map((dt) => (
-                  <button key={dt} onClick={() => setType(dt)} className={`w-full text-start px-5 py-4 rounded-xl border transition-all ${type === dt ? "border-primary bg-primary/10 text-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/30"}`}>
-                    {dt}
+                  <button key={dt.key} onClick={() => setType(dt.key)} className={`w-full text-start px-5 py-4 rounded-xl border transition-all ${type === dt.key ? "border-primary bg-primary/10 text-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/30"}`}>
+                    {t(dt.labelKey)}
                   </button>
                 ))}
               </div>
@@ -79,20 +111,25 @@ const Donate = () => {
                 <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g. 5000" className="w-full px-5 py-4 rounded-xl bg-card border border-border text-foreground text-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
                 <div className="flex gap-2 mt-4 flex-wrap">
                   {[1000, 2500, 5000, 10000].map((a) => (
-                    <button key={a} onClick={() => setAmount(String(a))} className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm hover:bg-primary/20 transition-colors">
-                      Rs. {a.toLocaleString()}
-                    </button>
+                    <button key={a} onClick={() => setAmount(String(a))} className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm hover:bg-primary/20 transition-colors">Rs. {a.toLocaleString()}</button>
                   ))}
+                </div>
+                <div className="mt-4 space-y-3">
+                  <input placeholder={t("donate.donorName")} value={donorName} onChange={e => setDonorName(e.target.value)} className="w-full px-4 py-3 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
+                  <input placeholder={t("donate.donorEmail")} value={donorEmail} onChange={e => setDonorEmail(e.target.value)} className="w-full px-4 py-3 rounded-xl bg-card border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
                 </div>
               </div>
             )}
             {step === 2 && (
               <div className="space-y-3">
                 <h2 className="text-lg font-semibold text-foreground mb-4">{t("donate.method")}</h2>
-                {paymentMethods.map((m) => (
-                  <button key={m.name} onClick={() => setMethod(m)} className={`w-full text-start px-5 py-4 rounded-xl border transition-all flex items-center gap-4 ${method?.name === m.name ? "border-primary bg-primary/10 text-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/30"}`}>
-                    <div className={`w-3 h-3 rounded-full ${m.color}`} />
-                    {m.name}
+                {methods.map((m) => (
+                  <button key={m.id} onClick={() => setMethod(m)} className={`w-full text-start px-5 py-4 rounded-xl border transition-all flex items-center gap-4 ${method?.id === m.id ? "border-primary bg-primary/10 text-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/30"}`}>
+                    <div className="w-3 h-3 rounded-full bg-primary" />
+                    <div>
+                      <p className="font-medium">{m.method_name}</p>
+                      <p className="text-xs text-muted-foreground">{m.account_title}</p>
+                    </div>
                   </button>
                 ))}
               </div>
@@ -100,20 +137,24 @@ const Donate = () => {
             {step === 3 && method && (
               <div className="bg-card border border-border rounded-2xl p-6 text-center space-y-4">
                 <h2 className="text-lg font-semibold text-foreground">{t("donate.instructions")}</h2>
-                <p className="text-muted-foreground text-sm">Send <span className="text-foreground font-bold">Rs. {Number(amount).toLocaleString()}</span> via <span className="text-foreground font-bold">{method.name}</span></p>
-                <div className="bg-secondary rounded-xl p-4">
-                  <p className="text-xs text-muted-foreground mb-1">Account Number</p>
-                  <p className="text-xl font-mono text-foreground tracking-wider">{method.account}</p>
+                <p className="text-muted-foreground text-sm">
+                  {t("donate.sendVia", { amount: `Rs. ${Number(amount).toLocaleString()}`, method: method.method_name })}
+                </p>
+                <div className="bg-secondary rounded-xl p-4 space-y-2">
+                  <div><p className="text-xs text-muted-foreground">{t("donate.accountTitle")}</p><p className="text-foreground font-medium">{method.account_title}</p></div>
+                  {method.phone_number && <div><p className="text-xs text-muted-foreground">{t("donate.accountNumber")}</p><p className="text-lg font-mono text-foreground tracking-wider">{method.phone_number}</p></div>}
+                  {method.iban && <div><p className="text-xs text-muted-foreground">{t("donate.iban")}</p><p className="text-xs font-mono text-foreground">{method.iban}</p></div>}
                 </div>
               </div>
             )}
             {step === 4 && (
               <div className="text-center space-y-6">
                 <h2 className="text-lg font-semibold text-foreground">{t("donate.upload")}</h2>
-                <div className="border-2 border-dashed border-border rounded-2xl p-10 hover:border-primary/30 transition-colors cursor-pointer">
+                <label className="border-2 border-dashed border-border rounded-2xl p-10 hover:border-primary/30 transition-colors cursor-pointer block">
                   <Upload size={32} className="mx-auto text-muted-foreground mb-3" />
-                  <p className="text-sm text-muted-foreground">Click to upload or drag and drop</p>
-                </div>
+                  <p className="text-sm text-muted-foreground">{screenshotFile ? screenshotFile.name : t("donate.uploadHint")}</p>
+                  <input type="file" accept="image/*" className="hidden" onChange={e => setScreenshotFile(e.target.files?.[0] || null)} />
+                </label>
               </div>
             )}
           </motion.div>
@@ -128,8 +169,8 @@ const Donate = () => {
               {t("donate.next")} <ArrowRight size={16} />
             </Button>
           ) : (
-            <Button variant="hero" onClick={() => setDone(true)} className="text-sm py-2 px-6">
-              {t("donate.submit")}
+            <Button variant="hero" onClick={handleSubmit} disabled={uploading} className="text-sm py-2 px-6">
+              {uploading ? t("common.loading") : t("donate.submit")}
             </Button>
           )}
         </div>
