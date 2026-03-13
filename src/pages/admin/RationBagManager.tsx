@@ -1,17 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useRationBagItems } from "@/hooks/useRationBagItems";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const RationBagManager = () => {
   const { items, addItem, updateItem, deleteItem } = useRationBagItems();
   const [editing, setEditing] = useState<any>(null);
   const [open, setOpen] = useState(false);
+  const [bagPrice, setBagPrice] = useState("");
+  const [bagConfigId, setBagConfigId] = useState("");
 
   const emptyForm = { item_name_en: "", item_name_ur: "", quantity: "", unit: "" };
   const [form, setForm] = useState(emptyForm);
+
+  useEffect(() => {
+    supabase.from("ration_bag_config" as any).select("*").limit(1).maybeSingle().then(({ data }) => {
+      if (data) {
+        setBagPrice(String((data as any).total_price));
+        setBagConfigId((data as any).id);
+      }
+    });
+  }, []);
 
   const openNew = () => { setForm(emptyForm); setEditing(null); setOpen(true); };
   const openEdit = (item: any) => { setForm({ item_name_en: item.item_name_en, item_name_ur: item.item_name_ur, quantity: item.quantity || "", unit: item.unit || "" }); setEditing(item); setOpen(true); };
@@ -33,11 +45,24 @@ const RationBagManager = () => {
     toast.success("Item deleted");
   };
 
+  const saveBagPrice = async () => {
+    if (!bagConfigId) return;
+    const { error } = await supabase.from("ration_bag_config" as any).update({ total_price: Number(bagPrice), updated_at: new Date().toISOString() } as any).eq("id", bagConfigId);
+    if (!error) toast.success("Bag price updated");
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-foreground">Ration Bag Items</h2>
         <Button onClick={openNew} className="gap-2"><Plus size={16} /> Add Item</Button>
+      </div>
+
+      {/* Bag Price Config */}
+      <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4">
+        <label className="text-sm text-foreground font-medium whitespace-nowrap">Total Bag Price (PKR):</label>
+        <input type="number" value={bagPrice} onChange={e => setBagPrice(e.target.value)} className="flex-1 px-3 py-2 rounded-lg bg-secondary border border-border text-foreground text-sm" />
+        <Button onClick={saveBagPrice} size="sm">Save Price</Button>
       </div>
 
       <div className="bg-card border border-border rounded-xl overflow-hidden">

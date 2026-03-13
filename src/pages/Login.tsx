@@ -2,9 +2,20 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { Eye, EyeOff } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+
+const BLOCKED_DOMAINS = ["mailinator.com", "guerrillamail.com", "tempmail.com", "throwaway.email", "yopmail.com", "sharklasers.com", "trashmail.com", "fakeinbox.com"];
+
+const validateEmailDomain = (email: string): boolean => {
+  const domain = email.split("@")[1]?.toLowerCase();
+  if (!domain) return false;
+  if (BLOCKED_DOMAINS.includes(domain)) return false;
+  if (!/^[a-z0-9.-]+\.[a-z]{2,}$/.test(domain)) return false;
+  return true;
+};
 
 const Login = () => {
   const { t } = useLanguage();
@@ -13,20 +24,29 @@ const Login = () => {
   const [isSignup, setIsSignup] = useState(false);
   const [isForgot, setIsForgot] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [emailError, setEmailError] = useState("");
   const [form, setForm] = useState({ name: "", email: "", password: "", phone: "" });
 
-  // Redirect if already logged in
   if (user) {
     navigate("/", { replace: true });
     return null;
   }
 
-  const update = (key: string, value: string) => setForm({ ...form, [key]: value });
+  const update = (key: string, value: string) => {
+    setForm({ ...form, [key]: value });
+    if (key === "email") setEmailError("");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
 
+    if (!validateEmailDomain(form.email)) {
+      setEmailError("Please use a valid email address (e.g. Gmail, Yahoo, Outlook).");
+      return;
+    }
+
+    setLoading(true);
     try {
       if (isForgot) {
         const { error } = await resetPassword(form.email);
@@ -35,7 +55,14 @@ const Login = () => {
         setIsForgot(false);
       } else if (isSignup) {
         const { error } = await signUp(form.email, form.password, form.name, form.phone);
-        if (error) throw error;
+        if (error) {
+          if (error.message?.includes("already registered")) {
+            toast.error("An account with this email already exists. Please sign in instead.");
+          } else {
+            throw error;
+          }
+          return;
+        }
         toast.success("Account created! Please check your email to verify.");
       } else {
         const { error } = await signIn(form.email, form.password);
@@ -52,11 +79,7 @@ const Login = () => {
 
   return (
     <div className="pt-24 pb-16 px-4 min-h-screen flex items-center justify-center">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md"
-      >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
             {isForgot ? "Reset Password" : isSignup ? t("login.signup") : t("login.title")}
@@ -81,7 +104,7 @@ const Login = () => {
                 />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Phone</label>
+                <label className="text-xs text-muted-foreground mb-1 block">{t("login.phone")}</label>
                 <input
                   type="tel"
                   value={form.phone}
@@ -100,23 +123,33 @@ const Login = () => {
               required
               value={form.email}
               onChange={(e) => update("email", e.target.value)}
-              placeholder="email@example.com"
-              className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+              placeholder={t("login.email")}
+              className={`w-full px-4 py-3 rounded-xl bg-secondary border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm ${emailError ? "border-destructive" : "border-border"}`}
             />
+            {emailError && <p className="text-xs text-destructive mt-1">{emailError}</p>}
           </div>
 
           {!isForgot && (
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">{t("login.password")}</label>
-              <input
-                type="password"
-                required
-                value={form.password}
-                onChange={(e) => update("password", e.target.value)}
-                placeholder="••••••••"
-                minLength={6}
-                className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={form.password}
+                  onChange={(e) => update("password", e.target.value)}
+                  placeholder={t("login.password")}
+                  minLength={6}
+                  className="w-full px-4 py-3 pr-12 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
           )}
 

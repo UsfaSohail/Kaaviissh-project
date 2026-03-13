@@ -10,10 +10,11 @@ const ZakatCalculator = () => {
   const { t } = useLanguage();
   const { rates, loading } = useZakatRates();
 
-  const goldRate = rates ? Number(rates.gold_rate_per_gram) : 21500;
-  const silverRate = rates ? Number(rates.silver_rate_per_gram) : 265;
+  const goldRate = rates ? Number(rates.gold_rate_per_gram) : 0;
+  const silverRate = rates ? Number(rates.silver_rate_per_gram) : 0;
   const nisabSilver = 612.36;
   const nisabValue = nisabSilver * silverRate;
+  const lastUpdated = rates?.last_updated ? new Date(rates.last_updated).toLocaleDateString() : "";
 
   const [assets, setAssets] = useState({ cash: "", loans: "", investments: "", trade: "" });
   const [gold, setGold] = useState("");
@@ -33,9 +34,24 @@ const ZakatCalculator = () => {
   const InputField = ({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) => (
     <div>
       <label className="text-xs text-muted-foreground mb-1 block">{label}</label>
-      <input type="number" value={value} onChange={(e) => onChange(e.target.value)} placeholder="0" className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm" />
+      <input
+        type="number"
+        inputMode="decimal"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="0"
+        className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+      />
     </div>
   );
+
+  if (loading) {
+    return (
+      <div className="pt-24 pb-16 px-4 min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="pt-24 pb-16 px-4">
@@ -56,9 +72,14 @@ const ZakatCalculator = () => {
           </div>
         </div>
 
-        <div className="flex items-center justify-center gap-2 mb-8 px-4 py-2.5 rounded-xl bg-primary/5 border border-primary/20">
-          <ShieldCheck size={16} className="text-primary flex-shrink-0" />
-          <p className="text-xs text-primary font-medium">{t("zakat.ratesVerified")}</p>
+        <div className="flex flex-col items-center gap-1 mb-8">
+          <div className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary/5 border border-primary/20">
+            <ShieldCheck size={16} className="text-primary flex-shrink-0" />
+            <p className="text-xs text-primary font-medium">{t("zakat.ratesVerified")}</p>
+          </div>
+          {lastUpdated && (
+            <p className="text-xs text-muted-foreground">Last Updated: {lastUpdated}</p>
+          )}
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-6 mb-6">
