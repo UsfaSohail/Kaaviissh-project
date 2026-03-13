@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Check } from "lucide-react";
+import { Check, LogIn } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useApplications } from "@/hooks/useApplications";
@@ -11,6 +12,7 @@ import { toast } from "sonner";
 const ApplyForHelp = () => {
   const [submitted, setSubmitted] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const { t } = useLanguage();
   const { user } = useAuth();
   const { submitApplication } = useApplications();
@@ -20,7 +22,10 @@ const ApplyForHelp = () => {
   const update = (key: string, value: string) => setForm({ ...form, [key]: value });
 
   const handleSubmit = async () => {
-    if (!user) return;
+    if (!user) {
+      setShowLoginPrompt(true);
+      return;
+    }
     setUploading(true);
     let documentsUrl = "";
     if (docFile) {
@@ -69,7 +74,7 @@ const ApplyForHelp = () => {
   }
 
   return (
-    <div className="pt-24 pb-16 px-4">
+    <div className="pt-24 pb-16 px-4 relative">
       <div className="container mx-auto max-w-lg">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
           <h1 className="text-4xl font-bold text-foreground mb-3">{t("apply.title")}</h1>
@@ -97,6 +102,30 @@ const ApplyForHelp = () => {
           </Button>
         </div>
       </div>
+
+      {/* Login prompt overlay */}
+      {showLoginPrompt && (
+        <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-card border border-border rounded-2xl p-8 max-w-sm text-center">
+            <LogIn size={32} className="text-primary mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-foreground mb-2">Account Required</h3>
+            <p className="text-sm text-muted-foreground mb-6">
+              Please create an account or sign in to submit your application.
+            </p>
+            <div className="flex gap-3 justify-center">
+              <Link to="/login" state={{ returnTo: "/apply" }}>
+                <Button variant="hero">Sign In</Button>
+              </Link>
+              <Link to="/login?signup=true" state={{ returnTo: "/apply" }}>
+                <Button variant="heroOutline">Create Account</Button>
+              </Link>
+            </div>
+            <button onClick={() => setShowLoginPrompt(false)} className="mt-4 text-xs text-muted-foreground hover:text-foreground">
+              Cancel
+            </button>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };

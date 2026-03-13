@@ -23,7 +23,9 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider">{t("footer.contact")}</h4>
             <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground"><Mail size={14} className="text-primary" /> kaaviissh@gmail.com</div>
+              <a href="mailto:kaaviissh@gmail.com" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+                <Mail size={14} className="text-primary" /> kaaviissh@gmail.com
+              </a>
               <a href="https://instagram.com/kaaviissh" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
                 <Instagram size={14} className="text-primary" /> @kaaviissh
               </a>
@@ -32,8 +34,8 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider">{t("footer.legal")}</h4>
             <div className="flex flex-col gap-2">
-              <Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t("footer.privacy")}</Link>
-              <Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t("footer.terms")}</Link>
+              <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t("footer.privacy")}</Link>
+              <Link to="/terms-of-service" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t("footer.terms")}</Link>
             </div>
           </div>
         </div>

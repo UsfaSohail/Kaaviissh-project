@@ -27,6 +27,7 @@ const Donate = () => {
   const [donorName, setDonorName] = useState("");
   const [donorEmail, setDonorEmail] = useState("");
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
+  const [screenshotError, setScreenshotError] = useState("");
   const [uploading, setUploading] = useState(false);
   const { t } = useLanguage();
   const { methods } = usePaymentMethods(true);
@@ -41,16 +42,19 @@ const Donate = () => {
   };
 
   const handleSubmit = async () => {
+    if (!screenshotFile) {
+      setScreenshotError("Please upload your payment screenshot to proceed.");
+      return;
+    }
+    setScreenshotError("");
     setUploading(true);
     let screenshotUrl = "";
-    if (screenshotFile) {
-      const ext = screenshotFile.name.split(".").pop();
-      const path = `${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from("donation-screenshots").upload(path, screenshotFile);
-      if (!error) {
-        const { data: urlData } = supabase.storage.from("donation-screenshots").getPublicUrl(path);
-        screenshotUrl = urlData.publicUrl;
-      }
+    const ext = screenshotFile.name.split(".").pop();
+    const path = `${Date.now()}.${ext}`;
+    const { error: uploadError } = await supabase.storage.from("donation-screenshots").upload(path, screenshotFile);
+    if (!uploadError) {
+      const { data: urlData } = supabase.storage.from("donation-screenshots").getPublicUrl(path);
+      screenshotUrl = urlData.publicUrl;
     }
     await submitDonation({
       amount: Number(amount),
@@ -108,7 +112,7 @@ const Donate = () => {
             {step === 1 && (
               <div>
                 <h2 className="text-lg font-semibold text-foreground mb-4">{t("donate.amount")}</h2>
-                <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g. 5000" className="w-full px-5 py-4 rounded-xl bg-card border border-border text-foreground text-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
+                <input type="number" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g. 5000" className="w-full px-5 py-4 rounded-xl bg-card border border-border text-foreground text-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
                 <div className="flex gap-2 mt-4 flex-wrap">
                   {[1000, 2500, 5000, 10000].map((a) => (
                     <button key={a} onClick={() => setAmount(String(a))} className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm hover:bg-primary/20 transition-colors">Rs. {a.toLocaleString()}</button>
@@ -150,11 +154,13 @@ const Donate = () => {
             {step === 4 && (
               <div className="text-center space-y-6">
                 <h2 className="text-lg font-semibold text-foreground">{t("donate.upload")}</h2>
-                <label className="border-2 border-dashed border-border rounded-2xl p-10 hover:border-primary/30 transition-colors cursor-pointer block">
+                <label className={`border-2 border-dashed rounded-2xl p-10 hover:border-primary/30 transition-colors cursor-pointer block ${screenshotError ? "border-destructive" : "border-border"}`}>
                   <Upload size={32} className="mx-auto text-muted-foreground mb-3" />
                   <p className="text-sm text-muted-foreground">{screenshotFile ? screenshotFile.name : t("donate.uploadHint")}</p>
-                  <input type="file" accept="image/*" className="hidden" onChange={e => setScreenshotFile(e.target.files?.[0] || null)} />
+                  <input type="file" accept="image/*" className="hidden" onChange={e => { setScreenshotFile(e.target.files?.[0] || null); setScreenshotError(""); }} />
                 </label>
+                {screenshotError && <p className="text-sm text-destructive">{screenshotError}</p>}
+                <p className="text-xs text-destructive font-medium">* Screenshot is required to submit your donation.</p>
               </div>
             )}
           </motion.div>

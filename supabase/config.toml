@@ -1,1 +1,4 @@
 project_id = "mgfebjymljcikabukxzs"
+
+[functions.fetch-gold-silver-rates]
+verify_jwt = false

@@ -9,7 +9,8 @@
     "donate": "Donate Now",
     "login": "Login",
     "logout": "Logout",
-    "admin": "Admin Dashboard"
+    "admin": "Admin Dashboard",
+    "chat": "Chat"
   },
   "hero": {
     "tagline": "میری ہر کاوش میرے رب کے نام",
@@ -210,6 +211,18 @@
     "totalApplications": "Total Applications",
     "pendingDonations": "Pending Donations",
     "backToSite": "Back to Site"
+  },
+  "rationBag": {
+    "title": "What's in a Ration Bag?",
+    "donate": "Donate a Ration Bag",
+    "donateFor5": "Donate for 5 Families"
+  },
+  "chat": {
+    "title": "Chat / Helpline",
+    "loginRequired": "Please sign in to start a conversation.",
+    "empty": "Start a conversation with our team.",
+    "offline": "Our team will respond shortly — إن شاء اللہ",
+    "placeholder": "Type your message..."
   },
   "common": {
     "loading": "Loading...",

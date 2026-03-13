@@ -286,6 +286,30 @@ export type Database = {
         }
         Relationships: []
       }
+      legal_content: {
+        Row: {
+          body_en: string
+          body_ur: string
+          id: string
+          key: string
+          updated_at: string
+        }
+        Insert: {
+          body_en?: string
+          body_ur?: string
+          id?: string
+          key: string
+          updated_at?: string
+        }
+        Update: {
+          body_en?: string
+          body_ur?: string
+          id?: string
+          key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_methods: {
         Row: {
           account_title: string
@@ -376,6 +400,24 @@ export type Database = {
           source_ur?: string | null
           text_en?: string
           text_ur?: string
+        }
+        Relationships: []
+      }
+      ration_bag_config: {
+        Row: {
+          id: string
+          total_price: number
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          total_price?: number
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          total_price?: number
+          updated_at?: string
         }
         Relationships: []
       }
