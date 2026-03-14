@@ -89,7 +89,22 @@ const DonationsManager = () => {
                 <td className="p-3 text-muted-foreground text-xs">{new Date(d.created_at).toLocaleDateString()}</td>
                 <td className="p-3 flex gap-2">
                   {d.screenshot_url && (
-                    <button onClick={() => setViewScreenshot(d.screenshot_url)} className="text-muted-foreground hover:text-foreground" title="View Screenshot">
+                    <button onClick={async () => {
+                      let path = d.screenshot_url;
+                      if (path.startsWith('http')) {
+                        // Extract path from full URL
+                        const urlParts = path.split('/donation-screenshots/');
+                        if (urlParts.length > 1) {
+                          path = urlParts[1];
+                        }
+                      }
+                      const { data, error } = await supabase.storage.from("donation-screenshots").createSignedUrl(path, 3600); // 1 hour expiry
+                      if (error) {
+                        toast.error("Failed to generate screenshot URL");
+                      } else {
+                        setViewScreenshot(data.signedUrl);
+                      }
+                    }} className="text-muted-foreground hover:text-foreground" title="View Screenshot">
                       <Eye size={16} />
                     </button>
                   )}
@@ -113,7 +128,7 @@ const DonationsManager = () => {
       {viewScreenshot && (
         <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setViewScreenshot(null)}>
           <div className="max-w-2xl max-h-[90vh] overflow-auto" onClick={e => e.stopPropagation()}>
-            <img src={viewScreenshot} alt="Payment Screenshot" className="rounded-xl border border-border" />
+            <img src={viewScreenshot} alt="Payment Screenshot" className="rounded-xl border border-border" onError={() => toast.error("Failed to load screenshot")} />
             <div className="text-center mt-4">
               <Button variant="ghost" onClick={() => setViewScreenshot(null)} className="text-muted-foreground">Close</Button>
             </div>
