@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Globe, LogOut, Shield } from "lucide-react";
+import { Menu, X, Globe, LogOut, Shield, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -63,6 +63,10 @@ const Navbar = () => {
                     {t("nav.admin")}
                   </Link>
                 )}
+                <Link to="/profile" className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <User size={16} />
+                  Profile
+                </Link>
                 <button onClick={() => setLogoutOpen(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors">
                   <LogOut size={16} />
                   {t("nav.logout")}
@@ -103,6 +107,9 @@ const Navbar = () => {
                         <Shield size={16} /> {t("nav.admin")}
                       </Link>
                     )}
+                    <Link to="/profile" onClick={() => setOpen(false)} className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-muted-foreground hover:text-foreground">
+                      <User size={16} /> Profile
+                    </Link>
                     <Button variant="ghost" className="w-full mt-1 py-3 text-sm" onClick={() => { setOpen(false); setLogoutOpen(true); }}>
                       <LogOut size={16} className="mr-2" /> {t("nav.logout")}
                     </Button>

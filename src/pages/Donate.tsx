@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ArrowLeft, ArrowRight, Upload } from "lucide-react";
@@ -16,12 +17,17 @@ const donationTypes = [
   { key: "Custom", labelKey: "donate.typeCustom" },
 ];
 
-const steps = ["Type", "Amount", "Payment", "Instructions", "Upload"];
-
 const Donate = () => {
-  const [step, setStep] = useState(0);
-  const [type, setType] = useState("");
-  const [amount, setAmount] = useState("");
+  const [searchParams] = useSearchParams();
+  const preType = searchParams.get("type") || "";
+  const preAmount = searchParams.get("amount") || "";
+
+  // If type is pre-selected, skip step 0
+  const initialStep = preType ? 1 : 0;
+
+  const [step, setStep] = useState(initialStep);
+  const [type, setType] = useState(preType);
+  const [amount, setAmount] = useState(preAmount);
   const [method, setMethod] = useState<any>(null);
   const [done, setDone] = useState(false);
   const [donorName, setDonorName] = useState("");
@@ -33,6 +39,8 @@ const Donate = () => {
   const { methods } = usePaymentMethods(true);
   const { submitDonation } = useDonations();
   const { user } = useAuth();
+
+  const steps = ["Type", "Amount", "Payment", "Instructions", "Upload"];
 
   const canNext = () => {
     if (step === 0) return !!type;
@@ -167,7 +175,7 @@ const Donate = () => {
         </AnimatePresence>
 
         <div className="flex justify-between mt-10">
-          <Button variant="ghost" onClick={() => setStep(step - 1)} disabled={step === 0} className="text-muted-foreground">
+          <Button variant="ghost" onClick={() => setStep(step - 1)} disabled={step === 0 || (preType && step === 1)} className="text-muted-foreground">
             <ArrowLeft size={16} /> {t("donate.back")}
           </Button>
           {step < 4 ? (

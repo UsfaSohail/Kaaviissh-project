@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Check } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -26,6 +26,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const [signupSuccess, setSignupSuccess] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "", phone: "" });
 
   if (user) {
@@ -63,7 +64,8 @@ const Login = () => {
           }
           return;
         }
-        toast.success("Account created! Please check your email to verify.");
+        toast.success("Account created successfully!");
+        setSignupSuccess(true);
       } else {
         const { error } = await signIn(form.email, form.password);
         if (error) throw error;
@@ -76,6 +78,23 @@ const Login = () => {
       setLoading(false);
     }
   };
+
+  if (signupSuccess) {
+    return (
+      <div className="pt-24 pb-16 px-4 min-h-screen flex items-center justify-center">
+        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center max-w-md">
+          <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
+            <Check size={32} className="text-primary" />
+          </div>
+          <h2 className="text-2xl font-bold text-foreground mb-3">Account Created!</h2>
+          <p className="text-muted-foreground mb-6">Your account has been created successfully. Please sign in to continue.</p>
+          <Button variant="hero" onClick={() => { setSignupSuccess(false); setIsSignup(false); }}>
+            Sign In
+          </Button>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-24 pb-16 px-4 min-h-screen flex items-center justify-center">
