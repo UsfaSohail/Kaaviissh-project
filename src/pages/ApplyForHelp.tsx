@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, memo } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -8,6 +8,20 @@ import { useAuth } from "@/hooks/useAuth";
 import { useApplications } from "@/hooks/useApplications";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+// Memoized InputField prevents unnecessary re-renders
+const InputField = memo(({ label, field, value, onChange, placeholder, type = "text" }: { label: string; field: string; value: string; onChange: (val: string) => void; placeholder: string; type?: string }) => (
+  <div>
+    <label className="text-xs text-muted-foreground mb-1 block">{label}</label>
+    <input
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+    />
+  </div>
+));
 
 const ApplyForHelp = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -20,19 +34,15 @@ const ApplyForHelp = () => {
   const [form, setForm] = useState({ name: "", cnic: "", phone: "", address: "", city: "", income: "", details: "" });
   const [docFile, setDocFile] = useState<File | null>(null);
 
-  const update = (key: string, value: string) => setForm({ ...form, [key]: value });
+  const update = useCallback((key: string, value: string) => {
+    setForm(prev => ({ ...prev, [key]: value }));
+  }, []);
 
   const handleSubmit = async () => {
-    if (!user) {
-      setShowLoginPrompt(true);
-      return;
-    }
-    if (!docFile) {
-      setDocError("Please upload your supporting documents to proceed.");
-      return;
-    }
-    setDocError("");
-    setUploading(true);
+    if (!user) { setShowLoginPrompt(true); return; }
+    if (!docFile) { setDocError("Please upload your supporting documents to proceed."); return; }
+    setDocError(""); setUploading(true);
+
     let documentsUrl = "";
     const ext = docFile.name.split(".").pop();
     const path = `${user.id}/${Date.now()}.${ext}`;
@@ -41,6 +51,7 @@ const ApplyForHelp = () => {
       const { data } = supabase.storage.from("application-documents").getPublicUrl(path);
       documentsUrl = data.publicUrl;
     }
+
     const { error: submitError } = await submitApplication({
       user_id: user.id,
       full_name: form.name,
@@ -51,19 +62,10 @@ const ApplyForHelp = () => {
       income_details: form.income || null,
       documents_url: documentsUrl || null,
     });
-    setUploading(false);
-    if (!submitError) {
-      setSubmitted(true);
-      toast.success(t("apply.submitted"));
-    }
-  };
 
-  const InputField = ({ label, field, placeholder, type = "text" }: { label: string; field: string; placeholder: string; type?: string }) => (
-    <div>
-      <label className="text-xs text-muted-foreground mb-1 block">{label}</label>
-      <input type={type} value={(form as any)[field]} onChange={(e) => update(field, e.target.value)} placeholder={placeholder} className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm" />
-    </div>
-  );
+    setUploading(false);
+    if (!submitError) { setSubmitted(true); toast.success(t("apply.submitted")); }
+  };
 
   if (submitted) {
     return (
@@ -86,16 +88,24 @@ const ApplyForHelp = () => {
         </motion.div>
 
         <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
-          <InputField label={t("apply.fullName")} field="name" placeholder="Muhammad Ali" />
-          <InputField label={t("apply.cnic")} field="cnic" placeholder="12345-1234567-1" />
-          <InputField label={t("apply.phone")} field="phone" placeholder="0300-1234567" />
-          <InputField label={t("apply.address")} field="address" placeholder="House #, Street, Area" />
-          <InputField label={t("apply.city")} field="city" placeholder="Lahore" />
-          <InputField label={t("apply.income")} field="income" placeholder="0" type="number" />
+          <InputField label={t("apply.fullName")} field="name" value={form.name} onChange={val => update("name", val)} placeholder="Muhammad Ali" />
+          <InputField label={t("apply.cnic")} field="cnic" value={form.cnic} onChange={val => update("cnic", val)} placeholder="12345-1234567-1" />
+          <InputField label={t("apply.phone")} field="phone" value={form.phone} onChange={val => update("phone", val)} placeholder="0300-1234567" />
+          <InputField label={t("apply.address")} field="address" value={form.address} onChange={val => update("address", val)} placeholder="House #, Street, Area" />
+          <InputField label={t("apply.city")} field="city" value={form.city} onChange={val => update("city", val)} placeholder="Lahore" />
+          <InputField label={t("apply.income")} field="income" value={form.income} onChange={val => update("income", val)} placeholder="0" type="number" />
+
           <div>
             <label className="text-xs text-muted-foreground mb-1 block">{t("apply.details")}</label>
-            <textarea value={form.details} onChange={(e) => update("details", e.target.value)} placeholder={t("apply.detailsPlaceholder")} rows={4} className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm resize-none" />
+            <textarea
+              value={form.details}
+              onChange={(e) => update("details", e.target.value)}
+              placeholder={t("apply.detailsPlaceholder")}
+              rows={4}
+              className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm resize-none"
+            />
           </div>
+
           <label className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer hover:border-primary/30 transition-colors block ${docError ? "border-destructive" : "border-border"}`}>
             <p className="text-sm text-muted-foreground">{docFile ? docFile.name : t("apply.uploadDocs")}</p>
             <p className="text-xs text-muted-foreground mt-1">{t("apply.uploadHint")}</p>
