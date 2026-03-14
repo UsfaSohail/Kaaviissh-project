@@ -7,6 +7,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import CookieConsent from "@/components/CookieConsent";
+import ScrollToTop from "@/components/ScrollToTop";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Index from "./pages/Index";
@@ -20,6 +21,7 @@ import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import Chat from "./pages/Chat";
 import LegalPage from "./pages/LegalPage";
+import UserProfile from "./pages/UserProfile";
 import NotFound from "./pages/NotFound";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -32,6 +34,7 @@ import PaymentMethodsManager from "./pages/admin/PaymentMethodsManager";
 import ChatInbox from "./pages/admin/ChatInbox";
 import RationBagManager from "./pages/admin/RationBagManager";
 import LegalContentManager from "./pages/admin/LegalContentManager";
+import AdminProfile from "./pages/admin/AdminProfile";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +46,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <LanguageProvider>
+            <ScrollToTop />
             <Routes>
               {/* Admin routes — no Navbar/Footer */}
               <Route path="/admin" element={
@@ -60,6 +64,7 @@ const App = () => (
                 <Route path="chat" element={<ChatInbox />} />
                 <Route path="ration-bag" element={<RationBagManager />} />
                 <Route path="legal" element={<LegalContentManager />} />
+                <Route path="profile" element={<AdminProfile />} />
               </Route>
 
               {/* Public routes */}
@@ -77,6 +82,7 @@ const App = () => (
                     <Route path="/login" element={<Login />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/chat" element={<Chat />} />
+                    <Route path="/profile" element={<UserProfile />} />
                     <Route path="/:slug" element={<LegalPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>

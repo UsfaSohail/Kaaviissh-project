@@ -13,6 +13,7 @@ const ApplyForHelp = () => {
   const [submitted, setSubmitted] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [docError, setDocError] = useState("");
   const { t } = useLanguage();
   const { user } = useAuth();
   const { submitApplication } = useApplications();
@@ -26,18 +27,21 @@ const ApplyForHelp = () => {
       setShowLoginPrompt(true);
       return;
     }
+    if (!docFile) {
+      setDocError("Please upload your supporting documents to proceed.");
+      return;
+    }
+    setDocError("");
     setUploading(true);
     let documentsUrl = "";
-    if (docFile) {
-      const ext = docFile.name.split(".").pop();
-      const path = `${user.id}/${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from("application-documents").upload(path, docFile);
-      if (!error) {
-        const { data } = supabase.storage.from("application-documents").getPublicUrl(path);
-        documentsUrl = data.publicUrl;
-      }
+    const ext = docFile.name.split(".").pop();
+    const path = `${user.id}/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("application-documents").upload(path, docFile);
+    if (!error) {
+      const { data } = supabase.storage.from("application-documents").getPublicUrl(path);
+      documentsUrl = data.publicUrl;
     }
-    const { error } = await submitApplication({
+    const { error: submitError } = await submitApplication({
       user_id: user.id,
       full_name: form.name,
       cnic: form.cnic || null,
@@ -48,7 +52,7 @@ const ApplyForHelp = () => {
       documents_url: documentsUrl || null,
     });
     setUploading(false);
-    if (!error) {
+    if (!submitError) {
       setSubmitted(true);
       toast.success(t("apply.submitted"));
     }
@@ -92,11 +96,13 @@ const ApplyForHelp = () => {
             <label className="text-xs text-muted-foreground mb-1 block">{t("apply.details")}</label>
             <textarea value={form.details} onChange={(e) => update("details", e.target.value)} placeholder={t("apply.detailsPlaceholder")} rows={4} className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm resize-none" />
           </div>
-          <label className="border-2 border-dashed border-border rounded-xl p-6 text-center cursor-pointer hover:border-primary/30 transition-colors block">
+          <label className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer hover:border-primary/30 transition-colors block ${docError ? "border-destructive" : "border-border"}`}>
             <p className="text-sm text-muted-foreground">{docFile ? docFile.name : t("apply.uploadDocs")}</p>
             <p className="text-xs text-muted-foreground mt-1">{t("apply.uploadHint")}</p>
-            <input type="file" className="hidden" onChange={e => setDocFile(e.target.files?.[0] || null)} />
+            <input type="file" className="hidden" onChange={e => { setDocFile(e.target.files?.[0] || null); setDocError(""); }} />
           </label>
+          {docError && <p className="text-sm text-destructive">{docError}</p>}
+          <p className="text-xs text-destructive font-medium">* Document upload is required to submit your application.</p>
           <Button variant="hero" className="w-full mt-4" onClick={handleSubmit} disabled={!form.name || uploading}>
             {uploading ? t("common.loading") : t("apply.submit")}
           </Button>

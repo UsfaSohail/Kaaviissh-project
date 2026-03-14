@@ -16,7 +16,8 @@ const statusConfig: Record<string, { color: string }> = {
 
 const Drives = () => {
   const [filter, setFilter] = useState<CaseStatus>("all");
-  const [donateCase, setDonateCase] = useState<string | null>(null);
+  const [donateCaseId, setDonateCaseId] = useState<string | null>(null);
+  const [donateCaseName, setDonateCaseName] = useState("");
   const { t, lang } = useLanguage();
   const { cases, loading } = useCases();
 
@@ -28,6 +29,12 @@ const Drives = () => {
     { label: t("drives.inprogress"), value: "In Progress" },
     { label: t("drives.completed"), value: "Completed" },
   ];
+
+  const openDonate = (c: any) => {
+    const title = lang === "ur" && c.title_ur ? c.title_ur : c.title_en;
+    setDonateCaseId(c.id);
+    setDonateCaseName(title);
+  };
 
   return (
     <div className="pt-24 pb-16 px-4">
@@ -52,7 +59,7 @@ const Drives = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((c, i) => {
-              const progress = Number(c.target_amount) > 0 ? Math.round((Number(c.raised_amount) / Number(c.target_amount)) * 100) : 0;
+              const progress = Number(c.target_amount) > 0 ? Math.min(100, Math.round((Number(c.raised_amount) / Number(c.target_amount)) * 100)) : 0;
               const cfg = statusConfig[c.status] || statusConfig.Open;
               const title = lang === "ur" && c.title_ur ? c.title_ur : c.title_en;
               const desc = lang === "ur" && c.description_ur ? c.description_ur : c.description_en;
@@ -76,7 +83,7 @@ const Drives = () => {
                       <div className={`h-full rounded-full transition-all duration-500 ${c.status === "Completed" ? "bg-primary" : c.status === "In Progress" ? "bg-yellow-400" : "bg-blue-400"}`} style={{ width: `${progress}%` }} />
                     </div>
                   </div>
-                  <Button variant="hero" size="sm" className={`w-full text-sm py-2 px-4 ${c.status === "Completed" ? "opacity-50 cursor-not-allowed" : ""}`} onClick={() => c.status !== "Completed" && setDonateCase(title)} disabled={c.status === "Completed"}>
+                  <Button variant="hero" size="sm" className={`w-full text-sm py-2 px-4 ${c.status === "Completed" ? "opacity-50 cursor-not-allowed" : ""}`} onClick={() => c.status !== "Completed" && openDonate(c)} disabled={c.status === "Completed"}>
                     <Heart size={14} /> {t("drives.donatenow")}
                   </Button>
                 </motion.div>
@@ -85,7 +92,7 @@ const Drives = () => {
           </div>
         )}
       </div>
-      <DonateModal caseName={donateCase || ""} open={!!donateCase} onClose={() => setDonateCase(null)} />
+      <DonateModal caseId={donateCaseId || undefined} caseName={donateCaseName} open={!!donateCaseId} onClose={() => { setDonateCaseId(null); setDonateCaseName(""); }} />
     </div>
   );
 };

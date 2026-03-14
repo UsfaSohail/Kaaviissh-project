@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Briefcase, FileText, DollarSign, Users,
-  BarChart3, CreditCard, MessageSquare, Package, FileEdit, LogOut
+  BarChart3, CreditCard, MessageSquare, Package, FileEdit, LogOut, UserCog
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -30,6 +30,7 @@ const items = [
   { title: "Chat Inbox", url: "/admin/chat", icon: MessageSquare },
   { title: "Ration Bag", url: "/admin/ration-bag", icon: Package },
   { title: "Legal Content", url: "/admin/legal", icon: FileEdit },
+  { title: "Profile", url: "/admin/profile", icon: UserCog },
 ];
 
 export function AdminSidebar() {

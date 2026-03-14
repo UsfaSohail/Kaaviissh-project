@@ -11,11 +11,12 @@ import { toast } from "sonner";
 
 interface DonateModalProps {
   caseName: string;
+  caseId?: string;
   open: boolean;
   onClose: () => void;
 }
 
-const DonateModal = ({ caseName, open, onClose }: DonateModalProps) => {
+const DonateModal = ({ caseName, caseId, open, onClose }: DonateModalProps) => {
   const { t } = useLanguage();
   const { methods } = usePaymentMethods(true);
   const { submitDonation } = useDonations();
@@ -62,7 +63,18 @@ const DonateModal = ({ caseName, open, onClose }: DonateModalProps) => {
       payment_method: method?.method_name,
       screenshot_url: screenshotUrl || null,
       user_id: user?.id || null,
+      case_id: caseId || null,
     });
+
+    // Update case raised_amount
+    if (caseId) {
+      const { data: caseData } = await supabase.from("cases").select("raised_amount").eq("id", caseId).maybeSingle();
+      if (caseData) {
+        const newAmount = Number(caseData.raised_amount) + Number(amount);
+        await supabase.from("cases").update({ raised_amount: newAmount, updated_at: new Date().toISOString() }).eq("id", caseId);
+      }
+    }
+
     setUploading(false);
     setDone(true);
     toast.success(t("donate.thanks"));

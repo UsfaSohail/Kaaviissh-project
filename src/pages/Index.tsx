@@ -1,7 +1,7 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-import { ChevronDown, Eye, Target, Users, Package, Heart, HandHeart } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown, Eye, Target, Users, Package, Heart, HandHeart, Minus, Plus } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useQuotes } from "@/hooks/useQuotes";
@@ -52,6 +52,7 @@ const Index = () => {
   const { impact } = useImpactCounter();
   const { items: rationItems } = useRationBagItems();
   const [bagPrice, setBagPrice] = useState(10000);
+  const [bagQty, setBagQty] = useState(1);
   const quote = quotes[0];
 
   useEffect(() => {
@@ -75,7 +76,7 @@ const Index = () => {
         <div className="absolute inset-0 bg-background/75" />
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <h1
-            className="font-bold text-foreground mb-2 leading-tight whitespace-nowrap"
+            className="font-bold text-foreground leading-tight whitespace-nowrap"
             dir="rtl"
             style={{
               fontFamily: "'Noto Nastaliq Urdu', serif",
@@ -84,7 +85,7 @@ const Index = () => {
           >
             {t("hero.tagline")}
           </h1>
-          <p className="text-base md:text-xl text-muted-foreground mb-10 mt-2">
+          <p className="text-base md:text-xl text-muted-foreground mb-10 mt-6">
             {t("hero.subtitle")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -141,15 +142,31 @@ const Index = () => {
                 </motion.div>
               ))}
             </div>
-            <div className="text-center space-y-3">
-              <Link to="/donate">
+            <div className="text-center space-y-4">
+              {/* Quantity selector */}
+              <div className="flex items-center justify-center gap-4 mb-2">
+                <button
+                  onClick={() => setBagQty(Math.max(1, bagQty - 1))}
+                  className="w-10 h-10 rounded-full bg-secondary border border-border flex items-center justify-center text-foreground hover:bg-primary/20 transition-colors"
+                >
+                  <Minus size={16} />
+                </button>
+                <span className="text-2xl font-bold text-foreground min-w-[3rem] text-center">{bagQty}</span>
+                <button
+                  onClick={() => setBagQty(bagQty + 1)}
+                  className="w-10 h-10 rounded-full bg-secondary border border-border flex items-center justify-center text-foreground hover:bg-primary/20 transition-colors"
+                >
+                  <Plus size={16} />
+                </button>
+                <span className="text-sm text-muted-foreground">
+                  {bagQty === 1 ? "bag" : "bags"} for {bagQty === 1 ? "1 family" : `${bagQty} families`}
+                </span>
+              </div>
+              <Link to={`/donate?type=Ration&amount=${bagPrice * bagQty}`}>
                 <Button variant="hero" size="lg">
-                  {t("rationBag.donate")} — Rs. {bagPrice.toLocaleString()}
+                  {t("rationBag.donate")} — Rs. {(bagPrice * bagQty).toLocaleString()}
                 </Button>
               </Link>
-              <p className="text-sm text-muted-foreground">
-                {t("rationBag.donateFor5")} — Rs. {(bagPrice * 5).toLocaleString()}
-              </p>
             </div>
           </div>
         </section>
