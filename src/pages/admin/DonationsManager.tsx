@@ -10,6 +10,15 @@ const DonationsManager = () => {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [viewScreenshot, setViewScreenshot] = useState<string | null>(null);
 
+  const verify = async (id: string) => {
+    try {
+      await updateDonation(id, { status: "verified" }); // update backend
+      toast.success("Donation verified!");
+    } catch (err) {
+      toast.error("Failed to verify donation.");
+    }
+  };
+
   const toggleSelect = (id: string) => {
     const next = new Set(selected);
     if (next.has(id)) next.delete(id);
