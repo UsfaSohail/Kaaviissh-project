@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { useChat } from "@/hooks/useChat";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Send, CheckCircle } from "lucide-react";
+import { Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const ChatInbox = () => {
-  const { messages, sendMessage, markResolved, refetch } = useChat();
+  const { messages, sendMessage, refetch } = useChat();
   const { user } = useAuth();
   const [reply, setReply] = useState("");
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
@@ -48,12 +48,6 @@ const ChatInbox = () => {
     }
   };
 
-  const handleMarkResolved = async () => {
-    if (!selectedUser) return;
-    await markResolved(selectedUser);
-    refetch();
-  };
-
   const handleReply = async () => {
     if (!reply.trim() || !selectedUser) return;
     await sendMessage({ user_id: selectedUser, message: reply, sender: "admin" });
@@ -89,9 +83,6 @@ const ChatInbox = () => {
             <>
               <div className="p-3 border-b border-border flex items-center justify-between">
                 <span className="text-sm text-foreground font-medium">Chat with {userNames[selectedUser] || selectedUser?.slice(0, 8)}</span>
-                <Button variant="ghost" size="sm" onClick={handleMarkResolved} className="text-xs gap-1">
-                  <CheckCircle size={14} /> Mark Resolved
-                </Button>
               </div>
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {grouped[selectedUser]?.map(msg => (
