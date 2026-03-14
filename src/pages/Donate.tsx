@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ArrowLeft, ArrowRight, Upload } from "lucide-react";
@@ -22,7 +22,6 @@ const Donate = () => {
   const preType = searchParams.get("type") || "";
   const preAmount = searchParams.get("amount") || "";
 
-  // If type is pre-selected, skip step 0
   const initialStep = preType ? 1 : 0;
 
   const [step, setStep] = useState(initialStep);
@@ -35,10 +34,22 @@ const Donate = () => {
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [screenshotError, setScreenshotError] = useState("");
   const [uploading, setUploading] = useState(false);
+
   const { t } = useLanguage();
   const { methods } = usePaymentMethods(true);
   const { submitDonation } = useDonations();
   const { user } = useAuth();
+
+  if (!user) {
+    return (
+      <div className="pt-24 pb-16 px-4 min-h-screen flex flex-col items-center justify-center text-center">
+        <p className="text-red-500 mb-4">You must sign in to donate.</p>
+        <Link to="/login">
+          <Button variant="hero">Sign In</Button>
+        </Link>
+      </div>
+    );
+  }
 
   const steps = ["Type", "Amount", "Payment", "Instructions", "Upload"];
 
@@ -50,20 +61,31 @@ const Donate = () => {
   };
 
   const handleSubmit = async () => {
+    if (!user) {
+      toast.error("Please sign in to donate");
+      return;
+    }
+
     if (!screenshotFile) {
       setScreenshotError("Please upload your payment screenshot to proceed.");
       return;
     }
+
     setScreenshotError("");
     setUploading(true);
+
     let screenshotUrl = "";
     const ext = screenshotFile.name.split(".").pop();
     const path = `${Date.now()}.${ext}`;
-    const { error: uploadError } = await supabase.storage.from("donation-screenshots").upload(path, screenshotFile);
+    const { error: uploadError } = await supabase.storage
+      .from("donation-screenshots")
+      .upload(path, screenshotFile);
+
     if (!uploadError) {
-      const { data: urlData } = supabase.storage.from("donation-screenshots").getPublicUrl(path);
-      screenshotUrl = urlData.publicUrl;
+      const { data } = supabase.storage.from("donation-screenshots").getPublicUrl(path);
+      screenshotUrl = data?.publicUrl || "";
     }
+
     await submitDonation({
       amount: Number(amount),
       type,
@@ -73,18 +95,57 @@ const Donate = () => {
       screenshot_url: screenshotUrl || null,
       user_id: user?.id || null,
     });
+
     setUploading(false);
     setDone(true);
     toast.success(t("donate.thanks"));
   };
 
+  const downloadReceipt = () => {
+    if (!user) return;
+
+    const formattedAmount = Number(amount).toLocaleString("en-PK", {
+      style: "currency",
+      currency: "PKR",
+      minimumFractionDigits: 0,
+    });
+
+    const receiptData = `
+Donation Receipt
+---------------------
+Donor: ${donorName || user.email}
+Email: ${donorEmail || user.email}
+Type: ${type}
+Amount: ${formattedAmount}
+Payment Method: ${method?.method_name || "-"}
+Date: ${new Date().toLocaleString("en-PK")}
+`;
+
+    const blob = new Blob([receiptData], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `donation_receipt_${Date.now()}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (done) {
     return (
-      <div className="pt-24 pb-16 px-4 min-h-screen flex items-center justify-center">
-        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center max-w-md">
-          <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6"><Check size={32} className="text-primary" /></div>
+      <div className="pt-24 pb-16 px-4 min-h-screen flex flex-col items-center justify-center">
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="text-center max-w-md"
+        >
+          <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
+            <Check size={32} className="text-primary" />
+          </div>
           <h2 className="text-2xl font-bold text-foreground mb-3">{t("donate.thanks")}</h2>
-          <p className="text-muted-foreground italic">{t("donate.thanksMsg")}</p>
+          <p className="text-muted-foreground italic mb-6">{t("donate.thanksMsg")}</p>
+          <Button variant="hero" onClick={downloadReceipt}>
+            Download Receipt
+          </Button>
         </motion.div>
       </div>
     );

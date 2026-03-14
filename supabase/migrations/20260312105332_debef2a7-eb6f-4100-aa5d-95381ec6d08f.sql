@@ -23,10 +23,22 @@ DROP POLICY IF EXISTS "Users can insert donations" ON public.donations;
 DROP POLICY IF EXISTS "Anon can insert donations" ON public.donations;
 DROP POLICY IF EXISTS "Admins can manage donations" ON public.donations;
 
-CREATE POLICY "Users can view own donations" ON public.donations FOR SELECT TO authenticated USING (user_id = auth.uid());
-CREATE POLICY "Users can insert donations" ON public.donations FOR INSERT TO authenticated WITH CHECK (user_id = auth.uid());
-CREATE POLICY "Anon can insert donations" ON public.donations FOR INSERT TO anon WITH CHECK (user_id IS NULL);
-CREATE POLICY "Admins can manage donations" ON public.donations FOR ALL TO authenticated USING (public.has_role(auth.uid(), 'admin'));
+CREATE POLICY "Users can view own donations"
+  ON public.donations
+  FOR SELECT TO authenticated
+  USING (user_id = auth.uid());
+
+CREATE POLICY "Users can insert donations"
+  ON public.donations
+  FOR INSERT TO authenticated
+  WITH CHECK (user_id = auth.uid());
+
+FOR INSERT TO anon WITH CHECK (user_id IS NULL);
+
+CREATE POLICY "Admins can manage donations"
+  ON public.donations
+  FOR ALL TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'));
 
 -- APPLICATIONS
 DROP POLICY IF EXISTS "Users can view own applications" ON public.applications;
