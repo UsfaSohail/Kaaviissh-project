@@ -1,10 +1,25 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback, memo } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Calculator, TrendingDown, TrendingUp, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useZakatRates } from "@/hooks/useZakatRates";
+
+// Memoized InputField to prevent unnecessary re-renders
+const InputField = memo(({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) => (
+  <div>
+    <label className="text-xs text-muted-foreground mb-1 block">{label}</label>
+    <input
+      type="number"
+      inputMode="decimal"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder="0"
+      className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+    />
+  </div>
+));
 
 const ZakatCalculator = () => {
   const { t } = useLanguage();
@@ -21,29 +36,29 @@ const ZakatCalculator = () => {
   const [silver, setSilver] = useState("");
   const [liabilities, setLiabilities] = useState({ borrowed: "", bills: "", dues: "" });
 
+  // useMemo for calculated values
   const totalAssets = useMemo(() => {
     const a = Object.values(assets).reduce((s, v) => s + (Number(v) || 0), 0);
     return a + (Number(gold) || 0) * goldRate + (Number(silver) || 0) * silverRate;
   }, [assets, gold, silver, goldRate, silverRate]);
 
-  const totalLiabilities = useMemo(() => Object.values(liabilities).reduce((s, v) => s + (Number(v) || 0), 0), [liabilities]);
+  const totalLiabilities = useMemo(
+    () => Object.values(liabilities).reduce((s, v) => s + (Number(v) || 0), 0),
+    [liabilities]
+  );
+
   const netWorth = totalAssets - totalLiabilities;
   const zakatPayable = netWorth > nisabValue ? netWorth * 0.025 : 0;
   const aboveNisab = netWorth >= nisabValue;
 
-  const InputField = ({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) => (
-    <div>
-      <label className="text-xs text-muted-foreground mb-1 block">{label}</label>
-      <input
-        type="number"
-        inputMode="decimal"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="0"
-        className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-      />
-    </div>
-  );
+  // useCallback handlers for inputs to prevent recreation
+  const updateAssets = useCallback((key: string, value: string) => {
+    setAssets(prev => ({ ...prev, [key]: value }));
+  }, []);
+
+  const updateLiabilities = useCallback((key: string, value: string) => {
+    setLiabilities(prev => ({ ...prev, [key]: value }));
+  }, []);
 
   if (loading) {
     return (
@@ -77,9 +92,7 @@ const ZakatCalculator = () => {
             <ShieldCheck size={16} className="text-primary flex-shrink-0" />
             <p className="text-xs text-primary font-medium">{t("zakat.ratesVerified")}</p>
           </div>
-          {lastUpdated && (
-            <p className="text-xs text-muted-foreground">Last Updated: {lastUpdated}</p>
-          )}
+          {lastUpdated && <p className="text-xs text-muted-foreground">Last Updated: {lastUpdated}</p>}
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-6 mb-6">
@@ -87,10 +100,10 @@ const ZakatCalculator = () => {
             <TrendingUp size={18} className="text-primary" /> {t("zakat.assets")}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <InputField label={t("zakat.cash")} value={assets.cash} onChange={(v) => setAssets({ ...assets, cash: v })} />
-            <InputField label={t("zakat.loans")} value={assets.loans} onChange={(v) => setAssets({ ...assets, loans: v })} />
-            <InputField label={t("zakat.investments")} value={assets.investments} onChange={(v) => setAssets({ ...assets, investments: v })} />
-            <InputField label={t("zakat.trade")} value={assets.trade} onChange={(v) => setAssets({ ...assets, trade: v })} />
+            <InputField label={t("zakat.cash")} value={assets.cash} onChange={v => updateAssets("cash", v)} />
+            <InputField label={t("zakat.loans")} value={assets.loans} onChange={v => updateAssets("loans", v)} />
+            <InputField label={t("zakat.investments")} value={assets.investments} onChange={v => updateAssets("investments", v)} />
+            <InputField label={t("zakat.trade")} value={assets.trade} onChange={v => updateAssets("trade", v)} />
           </div>
         </div>
 
@@ -115,9 +128,9 @@ const ZakatCalculator = () => {
             <TrendingDown size={18} className="text-destructive" /> {t("zakat.liabilities")}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <InputField label={t("zakat.borrowed")} value={liabilities.borrowed} onChange={(v) => setLiabilities({ ...liabilities, borrowed: v })} />
-            <InputField label={t("zakat.bills")} value={liabilities.bills} onChange={(v) => setLiabilities({ ...liabilities, bills: v })} />
-            <InputField label={t("zakat.dues")} value={liabilities.dues} onChange={(v) => setLiabilities({ ...liabilities, dues: v })} />
+            <InputField label={t("zakat.borrowed")} value={liabilities.borrowed} onChange={v => updateLiabilities("borrowed", v)} />
+            <InputField label={t("zakat.bills")} value={liabilities.bills} onChange={v => updateLiabilities("bills", v)} />
+            <InputField label={t("zakat.dues")} value={liabilities.dues} onChange={v => updateLiabilities("dues", v)} />
           </div>
         </div>
 
