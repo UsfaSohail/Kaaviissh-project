@@ -2,11 +2,13 @@ import {
   LayoutDashboard, Briefcase, FileText, DollarSign, Users,
   BarChart3, CreditCard, MessageSquare, Package, FileEdit, LogOut, UserCog
 } from "lucide-react";
-import { NavLink } from "@/components/NavLink";
-import { useLocation, useNavigate } from "react-router-dom";
+
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
+
 import LogoutDialog from "@/components/LogoutDialog";
+
 import {
   Sidebar,
   SidebarContent,
@@ -19,6 +21,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
+// Added Profile item
 const items = [
   { title: "Overview", url: "/admin", icon: LayoutDashboard },
   { title: "Cases", url: "/admin/cases", icon: Briefcase },
@@ -30,15 +33,16 @@ const items = [
   { title: "Chat Inbox", url: "/admin/chat", icon: MessageSquare },
   { title: "Ration Bag", url: "/admin/ration-bag", icon: Package },
   { title: "Legal Content", url: "/admin/legal", icon: FileEdit },
-  { title: "Profile", url: "/admin/profile", icon: UserCog },
+  { title: "Profile", url: "/admin/profile", icon: UserCog }, // added
 ];
 
 export function AdminSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const location = useLocation();
-  const navigate = useNavigate();
+
   const { signOut } = useAuth();
+  const navigate = useNavigate();
+
   const [logoutOpen, setLogoutOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -61,8 +65,13 @@ export function AdminSidebar() {
                       <NavLink
                         to={item.url}
                         end={item.url === "/admin"}
-                        className="hover:bg-muted/50"
-                        activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
+                        className={({ isActive }) =>
+                          `flex items-center px-2 py-1.5 rounded-md transition-colors
+                          ${isActive
+                            ? "bg-sidebar-accent text-sidebar-primary font-medium"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          }`
+                        }
                       >
                         <item.icon className="mr-2 h-4 w-4" />
                         {!collapsed && <span>{item.title}</span>}
@@ -70,20 +79,31 @@ export function AdminSidebar() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
+
+                {/* Logout */}
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
-                    <button onClick={() => setLogoutOpen(true)} className="flex items-center w-full hover:bg-muted/50 px-2 py-1.5 rounded-md text-muted-foreground hover:text-foreground">
+                    <button
+                      onClick={() => setLogoutOpen(true)}
+                      className="flex items-center w-full px-2 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    >
                       <LogOut className="mr-2 h-4 w-4" />
                       {!collapsed && <span>Logout</span>}
                     </button>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
-      <LogoutDialog open={logoutOpen} onConfirm={handleLogout} onCancel={() => setLogoutOpen(false)} />
+
+      <LogoutDialog
+        open={logoutOpen}
+        onConfirm={handleLogout}
+        onCancel={() => setLogoutOpen(false)}
+      />
     </>
   );
 }

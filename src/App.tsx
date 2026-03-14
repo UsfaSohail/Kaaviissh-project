@@ -36,6 +36,7 @@ import RationBagManager from "./pages/admin/RationBagManager";
 import LegalContentManager from "./pages/admin/LegalContentManager";
 import AdminProfile from "./pages/admin/AdminProfile";
 
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -48,6 +49,7 @@ const App = () => (
           <LanguageProvider>
             <ScrollToTop />
             <Routes>
+
               {/* Admin routes — no Navbar/Footer */}
               <Route path="/admin" element={
                 <ProtectedRoute adminOnly>

@@ -32,6 +32,15 @@ const Navbar = () => {
     navigate("/");
   };
 
+  // Determine font size/padding depending on admin
+  const linkClasses = isAdmin
+    ? "px-2 py-1 rounded-md text-xs font-medium transition-colors"
+    : "px-3 py-2 rounded-lg text-sm font-medium transition-colors";
+
+  const buttonClasses = isAdmin
+    ? "flex items-center gap-1 px-2 py-1 rounded-md text-xs transition-colors"
+    : "flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-colors";
+
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
@@ -44,41 +53,69 @@ const Navbar = () => {
 
           <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
-              <Link key={link.path} to={link.path} className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${location.pathname === link.path ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"}`}>
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`${linkClasses} ${
+                  location.pathname === link.path
+                    ? "text-primary bg-primary/10"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
                 {link.label}
               </Link>
             ))}
           </div>
 
           <div className="hidden lg:flex items-center gap-2">
-            <button onClick={() => setLang(lang === "en" ? "ur" : "en")} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <button
+              onClick={() => setLang(lang === "en" ? "ur" : "en")}
+              className={`${buttonClasses} text-muted-foreground hover:text-foreground`}
+            >
               <Globe size={16} />
               {lang === "en" ? "اردو" : "English"}
             </button>
-            {user ? (
+
+            {user && (
               <>
                 {isAdmin && (
-                  <Link to="/admin" className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-primary hover:text-primary/80 transition-colors">
+                  <Link
+                    to="/admin"
+                    className={`${buttonClasses} text-primary hover:text-primary/80`}
+                  >
                     <Shield size={16} />
                     {t("nav.admin")}
                   </Link>
                 )}
-                <Link to="/profile" className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  <User size={16} />
-                  Profile
-                </Link>
-                <button onClick={() => setLogoutOpen(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors">
+
+                {!isAdmin && (
+                  <Link
+                    to="/profile"
+                    className={`${buttonClasses} text-muted-foreground hover:text-foreground`}
+                  >
+                    <User size={16} />
+                    Profile
+                  </Link>
+                )}
+
+                <button
+                  onClick={() => setLogoutOpen(true)}
+                  className={`${buttonClasses} text-muted-foreground hover:text-foreground`}
+                >
                   <LogOut size={16} />
                   {t("nav.logout")}
                 </button>
               </>
-            ) : (
+            )}
+
+            {!user && (
               <Link to="/login">
-                <Button variant="ghost" size="sm" className="text-sm">{t("nav.login")}</Button>
+                <Button variant="ghost" size="sm" className={isAdmin ? "text-xs px-2 py-1" : "text-sm"}>{t("nav.login")}</Button>
               </Link>
             )}
+
             <Link to="/donate">
-              <Button variant="hero" size="sm" className="px-6 py-2 text-sm">{t("nav.donate")}</Button>
+              <Button variant="hero" size="sm" className={isAdmin ? "px-4 py-1 text-xs" : "px-6 py-2 text-sm"}>{t("nav.donate")}</Button>
             </Link>
           </div>
 
@@ -87,46 +124,89 @@ const Navbar = () => {
           </button>
         </div>
 
+        {/* Mobile menu */}
         <AnimatePresence>
           {open && (
-            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="lg:hidden bg-background border-b border-border">
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="lg:hidden bg-background border-b border-border"
+            >
               <div className="flex flex-col p-4 gap-2">
                 {navLinks.map((link) => (
-                  <Link key={link.path} to={link.path} onClick={() => setOpen(false)} className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${location.pathname === link.path ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"}`}>
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    onClick={() => setOpen(false)}
+                    className={`${linkClasses} ${
+                      location.pathname === link.path
+                        ? "text-primary bg-primary/10"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
                     {link.label}
                   </Link>
                 ))}
-                <button onClick={() => setLang(lang === "en" ? "ur" : "en")} className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors">
+
+                <button
+                  onClick={() => setLang(lang === "en" ? "ur" : "en")}
+                  className={`${buttonClasses} text-muted-foreground hover:text-foreground`}
+                >
                   <Globe size={16} />
                   {lang === "en" ? "اردو" : "English"}
                 </button>
-                {user ? (
+
+                {user && (
                   <>
                     {isAdmin && (
-                      <Link to="/admin" onClick={() => setOpen(false)} className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-primary">
+                      <Link
+                        to="/admin"
+                        onClick={() => setOpen(false)}
+                        className={`${buttonClasses} text-primary`}
+                      >
                         <Shield size={16} /> {t("nav.admin")}
                       </Link>
                     )}
-                    <Link to="/profile" onClick={() => setOpen(false)} className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-muted-foreground hover:text-foreground">
-                      <User size={16} /> Profile
-                    </Link>
-                    <Button variant="ghost" className="w-full mt-1 py-3 text-sm" onClick={() => { setOpen(false); setLogoutOpen(true); }}>
+
+                    {!isAdmin && (
+                      <Link
+                        to="/profile"
+                        onClick={() => setOpen(false)}
+                        className={`${buttonClasses} text-muted-foreground hover:text-foreground`}
+                      >
+                        <User size={16} /> Profile
+                      </Link>
+                    )}
+
+                    <Button
+                      variant="ghost"
+                      className={`w-full mt-1 py-1 ${isAdmin ? "text-xs" : "text-sm"}`}
+                      onClick={() => {
+                        setOpen(false);
+                        setLogoutOpen(true);
+                      }}
+                    >
                       <LogOut size={16} className="mr-2" /> {t("nav.logout")}
                     </Button>
                   </>
-                ) : (
+                )}
+
+                {!user && (
                   <Link to="/login" onClick={() => setOpen(false)}>
-                    <Button variant="ghost" className="w-full mt-1 py-3 text-sm">{t("nav.login")}</Button>
+                    <Button variant="ghost" className={isAdmin ? "w-full py-1 text-xs" : "w-full py-3 text-sm"}>{t("nav.login")}</Button>
                   </Link>
                 )}
+
                 <Link to="/donate" onClick={() => setOpen(false)}>
-                  <Button variant="hero" className="w-full mt-1 py-3 text-sm">{t("nav.donate")}</Button>
+                  <Button variant="hero" className={isAdmin ? "w-full py-1 text-xs" : "w-full py-3 text-sm"}>{t("nav.donate")}</Button>
                 </Link>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </nav>
+
       <LogoutDialog open={logoutOpen} onConfirm={handleSignOut} onCancel={() => setLogoutOpen(false)} />
     </>
   );
