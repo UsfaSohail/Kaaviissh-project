@@ -66,14 +66,8 @@ const DonateModal = ({ caseName, caseId, open, onClose }: DonateModalProps) => {
       case_id: caseId || null,
     });
 
-    // Update case raised_amount
-    if (caseId) {
-      const { data: caseData } = await supabase.from("cases").select("raised_amount").eq("id", caseId).maybeSingle();
-      if (caseData) {
-        const newAmount = Number(caseData.raised_amount) + Number(amount);
-        await supabase.from("cases").update({ raised_amount: newAmount, updated_at: new Date().toISOString() }).eq("id", caseId);
-      }
-    }
+    // Note: Case raised_amount will be updated after admin verification
+    // Removed immediate update
 
     setUploading(false);
     setDone(true);

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useDonations } from "@/hooks/useDonations";
 import { Check, Download, Eye } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const DonationsManager = () => {
   const { donations, loading, updateDonation, exportCSV } = useDonations();
@@ -32,9 +33,14 @@ const DonationsManager = () => {
     a.href = url; a.download = "donations.csv"; a.click();
   };
 
-  const verify = async (id: string) => {
-    const { error } = await updateDonation(id, { status: "verified" });
-    if (!error) toast.success("Donation verified");
+  const exportSingle = (donation: any) => {
+    const headers = ["ID", "Donor", "Email", "Amount", "Type", "Method", "Status", "Date"];
+    const rows = [[donation.id, donation.donor_name, donation.donor_email, donation.amount, donation.type, donation.payment_method, donation.status, donation.created_at]];
+    const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `donation-${donation.id}.csv`; a.click();
   };
 
   return (
@@ -83,6 +89,9 @@ const DonationsManager = () => {
                       <Check size={16} />
                     </button>
                   )}
+                  <button onClick={() => exportSingle(d)} className="text-muted-foreground hover:text-foreground" title="Export CSV">
+                    <Download size={16} />
+                  </button>
                 </td>
               </tr>
             ))}

@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useChat } from "@/hooks/useChat";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Send, CheckCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const ChatInbox = () => {
-  const { messages, sendMessage, markResolved } = useChat();
+  const { messages, sendMessage, markResolved, refetch } = useChat();
   const { user } = useAuth();
   const [reply, setReply] = useState("");
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [userNames, setUserNames] = useState<Record<string, string>>({});
 
   // Group messages by user
   const grouped = messages.reduce((acc, msg) => {
@@ -18,6 +20,39 @@ const ChatInbox = () => {
   }, {} as Record<string, typeof messages>);
 
   const userIds = Object.keys(grouped);
+
+  useEffect(() => {
+    const fetchUserNames = async () => {
+      if (userIds.length === 0) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, name")
+        .in("id", userIds);
+      if (data) {
+        const names: Record<string, string> = {};
+        data.forEach(profile => {
+          names[profile.id] = profile.name;
+        });
+        setUserNames(names);
+      }
+    };
+    fetchUserNames();
+  }, [userIds]);
+
+  const handleSelectUser = async (uid: string) => {
+    setSelectedUser(uid);
+    // Mark all user messages as read
+    const userMessages = grouped[uid]?.filter(m => m.sender === "user" && !m.is_read);
+    for (const msg of userMessages || []) {
+      await supabase.from("chats").update({ is_read: true }).eq("id", msg.id);
+    }
+  };
+
+  const handleMarkResolved = async () => {
+    if (!selectedUser) return;
+    await markResolved(selectedUser);
+    refetch();
+  };
 
   const handleReply = async () => {
     if (!reply.trim() || !selectedUser) return;
@@ -37,9 +72,9 @@ const ChatInbox = () => {
             const lastMsg = msgs[msgs.length - 1];
             const unread = msgs.filter(m => !m.is_read && m.sender === "user").length;
             return (
-              <button key={uid} onClick={() => setSelectedUser(uid)} className={`w-full text-start p-4 border-b border-border/50 hover:bg-secondary/30 transition-colors ${selectedUser === uid ? "bg-secondary/50" : ""}`}>
+              <button key={uid} onClick={() => handleSelectUser(uid)} className={`w-full text-start p-4 border-b border-border/50 hover:bg-secondary/30 transition-colors ${selectedUser === uid ? "bg-secondary/50" : ""}`}>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-foreground font-medium truncate">{uid.slice(0, 8)}...</span>
+                  <span className="text-sm text-foreground font-medium truncate">{userNames[uid] || uid.slice(0, 8)}...</span>
                   {unread > 0 && <span className="bg-primary text-primary-foreground text-xs rounded-full px-2 py-0.5">{unread}</span>}
                 </div>
                 <p className="text-xs text-muted-foreground truncate mt-1">{lastMsg.message}</p>
@@ -53,8 +88,8 @@ const ChatInbox = () => {
           {selectedUser ? (
             <>
               <div className="p-3 border-b border-border flex items-center justify-between">
-                <span className="text-sm text-foreground font-medium">Chat with {selectedUser.slice(0, 8)}...</span>
-                <Button variant="ghost" size="sm" onClick={() => markResolved(selectedUser)} className="text-xs gap-1">
+                <span className="text-sm text-foreground font-medium">Chat with {userNames[selectedUser] || selectedUser?.slice(0, 8)}</span>
+                <Button variant="ghost" size="sm" onClick={handleMarkResolved} className="text-xs gap-1">
                   <CheckCircle size={14} /> Mark Resolved
                 </Button>
               </div>

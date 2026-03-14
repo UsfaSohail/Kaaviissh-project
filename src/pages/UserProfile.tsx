@@ -83,6 +83,10 @@ const UserProfile = () => {
           <div className="text-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto" /></div>
         ) : tab === "donations" ? (
           <div className="space-y-3">
+            <div className="bg-card border border-border rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold text-primary">Rs. {donations.reduce((sum, d) => sum + (d.status === "verified" ? d.amount : 0), 0).toLocaleString()}</p>
+              <p className="text-sm text-muted-foreground">Total Verified Donations</p>
+            </div>
             {donations.length === 0 ? (
               <p className="text-center text-muted-foreground py-12">No donations yet.</p>
             ) : donations.map(d => (

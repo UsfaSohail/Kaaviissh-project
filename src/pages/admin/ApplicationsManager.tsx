@@ -31,9 +31,14 @@ const ApplicationsManager = () => {
     a.href = url; a.download = "applications.csv"; a.click();
   };
 
-  const updateStatus = async (id: string, status: string) => {
-    const { error } = await updateApplication(id, { status });
-    if (!error) toast.success(`Application ${status.toLowerCase()}`);
+  const exportSingle = (application: any) => {
+    const headers = ["ID", "Name", "CNIC", "Phone", "City", "Status", "Date"];
+    const rows = [[application.id, application.full_name, application.cnic, application.phone, application.city, application.status, application.created_at]];
+    const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `application-${application.id}.csv`; a.click();
   };
 
   return (
@@ -76,6 +81,9 @@ const ApplicationsManager = () => {
                       <button onClick={() => updateStatus(a.id, "Rejected")} className="text-destructive hover:text-destructive/80"><X size={16} /></button>
                     </>
                   )}
+                  <button onClick={() => exportSingle(a)} className="text-muted-foreground hover:text-foreground" title="Export CSV">
+                    <Download size={16} />
+                  </button>
                 </td>
               </tr>
             ))}
