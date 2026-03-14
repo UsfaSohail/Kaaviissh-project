@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useApplications } from "@/hooks/useApplications";
+import { useChat } from "@/hooks/useChat";
 import { Check, X, Download } from "lucide-react";
 import { toast } from "sonner";
 
 const ApplicationsManager = () => {
   const { applications, updateApplication } = useApplications();
+  const { sendMessage } = useChat();
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const toggleSelect = (id: string) => {
@@ -31,14 +33,19 @@ const ApplicationsManager = () => {
     a.href = url; a.download = "applications.csv"; a.click();
   };
 
-  const exportSingle = (application: any) => {
-    const headers = ["ID", "Name", "CNIC", "Phone", "City", "Status", "Date"];
-    const rows = [[application.id, application.full_name, application.cnic, application.phone, application.city, application.status, application.created_at]];
-    const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = `application-${application.id}.csv`; a.click();
+  const handleStatusUpdate = async (application: any, status: string) => {
+    const { error } = await updateApplication(application.id, { status });
+    if (error) {
+      toast.error("Failed to update application status");
+    } else {
+      toast.success(`Application ${status.toLowerCase()} successfully`);
+      // Notify the user via chat
+      await sendMessage({
+        user_id: application.user_id,
+        message: `Your application has been ${status.toLowerCase()}.`,
+        sender: "admin"
+      });
+    }
   };
 
   return (
@@ -77,8 +84,8 @@ const ApplicationsManager = () => {
                 <td className="p-3 flex gap-2">
                   {a.status === "Pending" && (
                     <>
-                      <button onClick={() => updateStatus(a.id, "Approved")} className="text-primary hover:text-primary/80"><Check size={16} /></button>
-                      <button onClick={() => updateStatus(a.id, "Rejected")} className="text-destructive hover:text-destructive/80"><X size={16} /></button>
+                      <button onClick={() => handleStatusUpdate(a, "Approved")} className="text-primary hover:text-primary/80"><Check size={16} /></button>
+                      <button onClick={() => handleStatusUpdate(a, "Rejected")} className="text-destructive hover:text-destructive/80"><X size={16} /></button>
                     </>
                   )}
                   <button onClick={() => exportSingle(a)} className="text-muted-foreground hover:text-foreground" title="Export CSV">
