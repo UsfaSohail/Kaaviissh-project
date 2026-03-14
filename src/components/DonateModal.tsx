@@ -43,6 +43,18 @@ const DonateModal = ({ caseName, caseId, open, onClose }: DonateModalProps) => {
   };
 
   const handleSubmit = async () => {
+    if (!user) {
+      toast.error("Please sign in to donate.");
+      return;
+    }
+    if (!amount || Number(amount) <= 0) {
+      toast.error("Please enter a valid donation amount.");
+      return;
+    }
+    if (!method) {
+      toast.error("Please select a payment method.");
+      return;
+    }
     if (!screenshotFile) {
       setScreenshotError("Please upload your payment screenshot to proceed.");
       return;
@@ -52,19 +64,28 @@ const DonateModal = ({ caseName, caseId, open, onClose }: DonateModalProps) => {
     let screenshotUrl = "";
     const ext = screenshotFile.name.split(".").pop();
     const path = `${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("donation-screenshots").upload(path, screenshotFile);
-    if (!error) {
-      const { data } = supabase.storage.from("donation-screenshots").getPublicUrl(path);
-      screenshotUrl = data.publicUrl;
+    const { error: uploadError } = await supabase.storage.from("donation-screenshots").upload(path, screenshotFile);
+    if (uploadError) {
+      toast.error("Failed to upload screenshot. Please try again.");
+      setUploading(false);
+      return;
     }
-    await submitDonation({
+    const { data } = supabase.storage.from("donation-screenshots").getPublicUrl(path);
+    screenshotUrl = data.publicUrl;
+    const { error } = await submitDonation({
       amount: Number(amount),
-      type: "Case Specific",
+      type: "Custom",
       payment_method: method?.method_name,
-      screenshot_url: screenshotUrl || null,
+      screenshot_url: screenshotUrl,
       user_id: user?.id || null,
       case_id: caseId || null,
     });
+
+    if (error) {
+      toast.error(`Failed to submit donation: ${error.message || 'Unknown error'}`);
+      setUploading(false);
+      return;
+    }
 
     // Note: Case raised_amount will be updated after admin verification
     // Removed immediate update
