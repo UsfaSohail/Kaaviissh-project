@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, memo } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Calculator, TrendingDown, TrendingUp, ShieldCheck } from "lucide-react";
+import { Calculator, TrendingDown, TrendingUp, ShieldCheck, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useZakatRates } from "@/hooks/useZakatRates";
@@ -23,7 +23,8 @@ const InputField = memo(({ label, value, onChange }: { label: string; value: str
 
 const ZakatCalculator = () => {
   const { t } = useLanguage();
-  const { rates, loading } = useZakatRates();
+  const { rates, loading, refreshRates } = useZakatRates();
+  const [refreshing, setRefreshing] = useState(false);
 
   const goldRate = rates ? Number(rates.gold_rate_per_gram) : 0;
   const silverRate = rates ? Number(rates.silver_rate_per_gram) : 0;
@@ -35,6 +36,12 @@ const ZakatCalculator = () => {
   const [gold, setGold] = useState("");
   const [silver, setSilver] = useState("");
   const [liabilities, setLiabilities] = useState({ borrowed: "", bills: "", dues: "" });
+
+  const handleRefreshRates = async () => {
+    setRefreshing(true);
+    await refreshRates();
+    setRefreshing(false);
+  };
 
   // useMemo for calculated values
   const totalAssets = useMemo(() => {
@@ -92,7 +99,19 @@ const ZakatCalculator = () => {
             <ShieldCheck size={16} className="text-primary flex-shrink-0" />
             <p className="text-xs text-primary font-medium">{t("zakat.ratesVerified")}</p>
           </div>
-          {lastUpdated && <p className="text-xs text-muted-foreground">Last Updated: {lastUpdated}</p>}
+          <div className="flex items-center gap-2">
+            <p className="text-xs text-muted-foreground">Last Updated: {lastUpdated}</p>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleRefreshRates} 
+              disabled={refreshing}
+              className="h-6 px-2 text-xs"
+            >
+              <RefreshCw size={12} className={refreshing ? "animate-spin" : ""} />
+              {refreshing ? "Updating..." : "Refresh"}
+            </Button>
+          </div>
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-6 mb-6">

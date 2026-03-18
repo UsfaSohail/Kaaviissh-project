@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useZakatRates } from "@/hooks/useZakatRates";
+import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 const ZakatRatesManager = () => {
-  const { rates, loading, updateRates } = useZakatRates();
+  const { rates, loading, updateRates, refreshRates } = useZakatRates();
   const [gold, setGold] = useState(0);
   const [silver, setSilver] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (rates) {
@@ -15,6 +17,18 @@ const ZakatRatesManager = () => {
     }
   }, [rates]);
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    const result = await refreshRates();
+    setRefreshing(false);
+    
+    if (result?.success) {
+      toast.success("Rates refreshed successfully");
+    } else {
+      toast.error("Failed to refresh rates");
+    }
+  };
+
   const handleSave = async () => {
     const { error } = await updateRates(gold, silver);
     if (!error) toast.success("Zakat rates updated");
@@ -22,7 +36,13 @@ const ZakatRatesManager = () => {
 
   return (
     <div className="space-y-4 max-w-lg">
-      <h2 className="text-2xl font-bold text-foreground">Zakat Rates</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-foreground">Zakat Rates</h2>
+        <Button variant="outline" onClick={handleRefresh} disabled={refreshing} className="gap-2">
+          <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
+          {refreshing ? "Refreshing..." : "Refresh Rates"}
+        </Button>
+      </div>
       <div className="bg-card border border-border rounded-xl p-6 space-y-4">
         {rates && (
           <p className="text-xs text-muted-foreground">
