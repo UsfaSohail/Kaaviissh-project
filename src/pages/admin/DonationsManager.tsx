@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useDonations } from "@/hooks/useDonations";
+import { useCases } from "@/hooks/useCases";
 import { Check, Download, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 const DonationsManager = () => {
   const { donations, loading, updateDonation, exportCSV } = useDonations();
+  const { updateCase } = useCases();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [viewScreenshot, setViewScreenshot] = useState<string | null>(null);
 
@@ -14,6 +16,17 @@ const DonationsManager = () => {
     try {
       await updateDonation(id, { status: "verified" }); // update backend
       toast.success("Donation verified!");
+
+      // Update case raised_amount if donation has case_id
+      const donation = donations.find(d => d.id === id);
+      if (donation && donation.case_id) {
+        // Find the case and update raised_amount
+        const caseToUpdate = await supabase.from("cases").select("raised_amount").eq("id", donation.case_id).single();
+        if (caseToUpdate.data) {
+          const newRaised = Number(caseToUpdate.data.raised_amount) + Number(donation.amount);
+          await updateCase(donation.case_id, { raised_amount: newRaised });
+        }
+      }
     } catch (err) {
       toast.error("Failed to verify donation.");
     }

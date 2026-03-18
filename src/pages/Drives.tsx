@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { MapPin, Heart } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCases } from "@/hooks/useCases";
+import { useAuth } from "@/hooks/useAuth";
 import DonateModal from "@/components/DonateModal";
+import { toast } from "sonner";
 
 type CaseStatus = "all" | "Open" | "In Progress" | "Completed";
 
@@ -20,6 +23,8 @@ const Drives = () => {
   const [donateCaseName, setDonateCaseName] = useState("");
   const { t, lang } = useLanguage();
   const { cases, loading } = useCases();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const filtered = filter === "all" ? cases : cases.filter((c) => c.status === filter);
 
@@ -31,6 +36,11 @@ const Drives = () => {
   ];
 
   const openDonate = (c: any) => {
+    if (!user) {
+      toast.error("Please sign in to donate.");
+      navigate("/login");
+      return;
+    }
     const title = lang === "ur" && c.title_ur ? c.title_ur : c.title_en;
     setDonateCaseId(c.id);
     setDonateCaseName(title);

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, ArrowLeft, ArrowRight, Check, Upload } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { usePaymentMethods } from "@/hooks/usePaymentMethods";
 import { useDonations } from "@/hooks/useDonations";
@@ -21,6 +22,7 @@ const DonateModal = ({ caseName, caseId, open, onClose }: DonateModalProps) => {
   const { methods } = usePaymentMethods(true);
   const { submitDonation } = useDonations();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState<any>(null);
@@ -28,6 +30,15 @@ const DonateModal = ({ caseName, caseId, open, onClose }: DonateModalProps) => {
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [screenshotError, setScreenshotError] = useState("");
   const [uploading, setUploading] = useState(false);
+
+  // Check authentication when modal opens
+  useEffect(() => {
+    if (open && !user) {
+      toast.error("Please sign in to donate.");
+      navigate("/login");
+      onClose();
+    }
+  }, [open, user, navigate, onClose]);
 
   const steps = ["Amount", "Payment", "Instructions", "Upload"];
 
@@ -72,11 +83,17 @@ const DonateModal = ({ caseName, caseId, open, onClose }: DonateModalProps) => {
     }
     const { data } = supabase.storage.from("donation-screenshots").getPublicUrl(path);
     screenshotUrl = data.publicUrl;
+    
+    // Extract donor name from user metadata, fallback to email
+    const donorName = user?.user_metadata?.name || user?.email || "Anonymous";
+    
     const { error } = await submitDonation({
       amount: Number(amount),
       type: "Custom",
       payment_method: method?.method_name,
       screenshot_url: screenshotUrl,
+      donor_name: donorName,
+      donor_email: user?.email || null,
       user_id: user?.id || null,
       case_id: caseId || null,
     });
