@@ -2,12 +2,35 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Check } from "lucide-react";
+import { Eye, Check } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
-const BLOCKED_DOMAINS = ["mailinator.com", "guerrillamail.com", "tempmail.com", "throwaway.email", "yopmail.com", "sharklasers.com", "trashmail.com", "fakeinbox.com"];
+/* 🔥 Disable browser native password reveal icon */
+const disableNativePasswordIcon = `
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="password"]::-webkit-password-toggle-button,
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+`;
+const style = document.createElement("style");
+style.appendChild(document.createTextNode(disableNativePasswordIcon));
+document.head.appendChild(style);
+
+const BLOCKED_DOMAINS = [
+  "mailinator.com",
+  "guerrillamail.com",
+  "tempmail.com",
+  "throwaway.email",
+  "yopmail.com",
+  "sharklasers.com",
+  "trashmail.com",
+  "fakeinbox.com"
+];
 
 const validateEmailDomain = (email: string): boolean => {
   const domain = email.split("@")[1]?.toLowerCase();
@@ -82,13 +105,25 @@ const Login = () => {
   if (signupSuccess) {
     return (
       <div className="pt-24 pb-16 px-4 min-h-screen flex items-center justify-center">
-        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center max-w-md">
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="text-center max-w-md"
+        >
           <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
             <Check size={32} className="text-primary" />
           </div>
           <h2 className="text-2xl font-bold text-foreground mb-3">Account Created!</h2>
-          <p className="text-muted-foreground mb-6">Your account has been created successfully. Please sign in to continue.</p>
-          <Button variant="hero" onClick={() => { setSignupSuccess(false); setIsSignup(false); }}>
+          <p className="text-muted-foreground mb-6">
+            Your account has been created successfully. Please sign in to continue.
+          </p>
+          <Button
+            variant="hero"
+            onClick={() => {
+              setSignupSuccess(false);
+              setIsSignup(false);
+            }}
+          >
             Sign In
           </Button>
         </motion.div>
@@ -98,7 +133,11 @@ const Login = () => {
 
   return (
     <div className="pt-24 pb-16 px-4 min-h-screen flex items-center justify-center">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-md"
+      >
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
             {isForgot ? "Reset Password" : isSignup ? t("login.signup") : t("login.title")}
@@ -143,7 +182,9 @@ const Login = () => {
               value={form.email}
               onChange={(e) => update("email", e.target.value)}
               placeholder={t("login.email")}
-              className={`w-full px-4 py-3 rounded-xl bg-secondary border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm ${emailError ? "border-destructive" : "border-border"}`}
+              className={`w-full px-4 py-3 rounded-xl bg-secondary border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm ${
+                emailError ? "border-destructive" : "border-border"
+              }`}
             />
             {emailError && <p className="text-xs text-destructive mt-1">{emailError}</p>}
           </div>
@@ -166,7 +207,7 @@ const Login = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  <Eye size={18} className="text-white" />
                 </button>
               </div>
             </div>

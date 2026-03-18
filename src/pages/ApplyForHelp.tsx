@@ -2,15 +2,15 @@ import { useState, useCallback, memo } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Check, LogIn } from "lucide-react";
+import { Check, LogIn, FileText, X } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useApplications } from "@/hooks/useApplications";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-// Memoized InputField prevents unnecessary re-renders
-const InputField = memo(({ label, field, value, onChange, placeholder, type = "text" }: { label: string; field: string; value: string; onChange: (val: string) => void; placeholder: string; type?: string }) => (
+// Memoized InputField
+const InputField = memo(({ label, value, onChange, placeholder, type = "text" }) => (
   <div>
     <label className="text-xs text-muted-foreground mb-1 block">{label}</label>
     <input
@@ -28,28 +28,85 @@ const ApplyForHelp = () => {
   const [uploading, setUploading] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [docError, setDocError] = useState("");
+
   const { t } = useLanguage();
   const { user } = useAuth();
   const { submitApplication } = useApplications();
-  const [form, setForm] = useState({ name: "", cnic: "", phone: "", address: "", city: "", income: "", details: "" });
-  const [docFile, setDocFile] = useState<File | null>(null);
 
-  const update = useCallback((key: string, value: string) => {
+  const [form, setForm] = useState({
+    name: "",
+    cnic: "",
+    phone: "",
+    address: "",
+    city: "",
+    income: "",
+    details: ""
+  });
+
+  const [docFiles, setDocFiles] = useState([]);
+
+  const update = useCallback((key, value) => {
     setForm(prev => ({ ...prev, [key]: value }));
   }, []);
 
-  const handleSubmit = async () => {
-    if (!user) { setShowLoginPrompt(true); return; }
-    if (!docFile) { setDocError("Please upload your supporting documents to proceed."); return; }
-    setDocError(""); setUploading(true);
+const handleCnicChange = (value) => {
+  // Remove all non-digits
+  let digits = value.replace(/\D/g, "").slice(0, 13); // max 13 digits
+  let formatted = "";
+  if (digits.length <= 5) {
+    formatted = digits;
+  } else if (digits.length <= 12) {
+    formatted = digits.slice(0, 5) + "-" + digits.slice(5);
+  } else {
+    formatted = digits.slice(0, 5) + "-" + digits.slice(5, 12) + "-" + digits.slice(12);
+  }
+  update("cnic", formatted);
+};
 
-    let documentsUrl = "";
-    const ext = docFile.name.split(".").pop();
-    const path = `${user.id}/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("application-documents").upload(path, docFile);
-    if (!error) {
-      const { data } = supabase.storage.from("application-documents").getPublicUrl(path);
-      documentsUrl = data.publicUrl;
+// Phone input formatter: 0300-1234567
+const handlePhoneChange = (value) => {
+  let digits = value.replace(/\D/g, "").slice(0, 11); // max 11 digits
+  if (digits.length > 4) {
+    digits = digits.slice(0, 4) + "-" + digits.slice(4);
+  }
+  update("phone", digits);
+};
+
+  const handleFiles = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    setDocFiles(prev => [...prev, ...files]);
+    setDocError("");
+  };
+
+  const removeFile = (index) => {
+    setDocFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async () => {
+    if (!user) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    if (docFiles.length === 0) {
+      setDocError("Please upload at least one document.");
+      return;
+    }
+
+    setUploading(true);
+
+    const uploadedPaths = [];
+    for (let file of docFiles) {
+      const path = `${user.id}/${Date.now()}_${file.name}`;
+      const { error } = await supabase.storage
+        .from("application-documents")
+        .upload(path, file);
+      if (error) {
+        toast.error("Upload failed");
+        setUploading(false);
+        return;
+      }
+      uploadedPaths.push(path);
     }
 
     const { error: submitError } = await submitApplication({
@@ -60,18 +117,23 @@ const ApplyForHelp = () => {
       address: form.address || null,
       city: form.city || null,
       income_details: form.income || null,
-      documents_url: documentsUrl || null,
+      document_urls: uploadedPaths
     });
 
     setUploading(false);
-    if (!submitError) { setSubmitted(true); toast.success(t("apply.submitted")); }
+    if (!submitError) {
+      setSubmitted(true);
+      toast.success(t("apply.submitted"));
+    }
   };
 
   if (submitted) {
     return (
       <div className="pt-24 pb-16 px-4 min-h-screen flex items-center justify-center">
         <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center max-w-md">
-          <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6"><Check size={32} className="text-primary" /></div>
+          <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
+            <Check size={32} className="text-primary" />
+          </div>
           <h2 className="text-2xl font-bold text-foreground mb-3">{t("apply.submitted")}</h2>
           <p className="text-muted-foreground">{t("apply.submittedMsg")}</p>
         </motion.div>
@@ -88,58 +150,58 @@ const ApplyForHelp = () => {
         </motion.div>
 
         <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
-          <InputField label={t("apply.fullName")} field="name" value={form.name} onChange={val => update("name", val)} placeholder="Muhammad Ali" />
-          <InputField label={t("apply.cnic")} field="cnic" value={form.cnic} onChange={val => update("cnic", val)} placeholder="12345-1234567-1" />
-          <InputField label={t("apply.phone")} field="phone" value={form.phone} onChange={val => update("phone", val)} placeholder="0300-1234567" />
-          <InputField label={t("apply.address")} field="address" value={form.address} onChange={val => update("address", val)} placeholder="House #, Street, Area" />
-          <InputField label={t("apply.city")} field="city" value={form.city} onChange={val => update("city", val)} placeholder="Lahore" />
-          <InputField label={t("apply.income")} field="income" value={form.income} onChange={val => update("income", val)} placeholder="0" type="number" />
+          <InputField label={t("apply.fullName")} value={form.name} onChange={val => update("name", val)} placeholder="Muhammad Ali" />
+          <InputField label={t("apply.cnic")} value={form.cnic} onChange={handleCnicChange} placeholder="12345-1234567-1" />
+          <InputField label={t("apply.phone")} value={form.phone} onChange={handlePhoneChange} placeholder="0300-1234567" />
+          <InputField label={t("apply.address")} value={form.address} onChange={val => update("address", val)} placeholder="House #, Street, Area" />
+          <InputField label={t("apply.city")} value={form.city} onChange={val => update("city", val)} placeholder="Lahore" />
+          <InputField label={t("apply.income")} value={form.income} onChange={val => update("income", val)} placeholder="0" type="number" />
 
-          <div>
-            <label className="text-xs text-muted-foreground mb-1 block">{t("apply.details")}</label>
-            <textarea
-              value={form.details}
-              onChange={(e) => update("details", e.target.value)}
-              placeholder={t("apply.detailsPlaceholder")}
-              rows={4}
-              className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm resize-none"
-            />
-          </div>
-
-          <label className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer hover:border-primary/30 transition-colors block ${docError ? "border-destructive" : "border-border"}`}>
-            <p className="text-sm text-muted-foreground">{docFile ? docFile.name : t("apply.uploadDocs")}</p>
-            <p className="text-xs text-muted-foreground mt-1">{t("apply.uploadHint")}</p>
-            <input type="file" className="hidden" onChange={e => { setDocFile(e.target.files?.[0] || null); setDocError(""); }} />
+          <label className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer block ${docError ? "border-destructive" : "border-border"}`}>
+            <p className="text-sm text-muted-foreground">Upload Documents</p>
+            <input type="file" multiple className="hidden" onChange={handleFiles} />
           </label>
+
+          {docFiles.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {docFiles.map((file, index) => {
+                const isImage = file.type.startsWith("image/");
+                return (
+                  <div key={index} className="relative">
+                    {isImage ? (
+                      <img src={URL.createObjectURL(file)} className="w-16 h-16 object-cover rounded border" />
+                    ) : (
+                      <div className="w-16 h-16 flex items-center justify-center bg-secondary rounded border">
+                        <FileText size={20} />
+                      </div>
+                    )}
+                    <button onClick={() => removeFile(index)} className="absolute -top-2 -right-2 bg-destructive text-white rounded-full p-1">
+                      <X size={12} />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
           {docError && <p className="text-sm text-destructive">{docError}</p>}
-          <p className="text-xs text-destructive font-medium">* Document upload is required to submit your application.</p>
+
           <Button variant="hero" className="w-full mt-4" onClick={handleSubmit} disabled={!form.name || uploading}>
-            {uploading ? t("common.loading") : t("apply.submit")}
+            {uploading ? "Uploading..." : t("apply.submit")}
           </Button>
         </div>
       </div>
 
-      {/* Login prompt overlay */}
       {showLoginPrompt && (
-        <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-card border border-border rounded-2xl p-8 max-w-sm text-center">
+        <div className="fixed inset-0 z-[100] bg-black/70 flex items-center justify-center p-4">
+          <div className="bg-card border border-border rounded-2xl p-8 max-w-sm text-center">
             <LogIn size={32} className="text-primary mx-auto mb-4" />
             <h3 className="text-xl font-bold text-foreground mb-2">Account Required</h3>
-            <p className="text-sm text-muted-foreground mb-6">
-              Please create an account or sign in to submit your application.
-            </p>
             <div className="flex gap-3 justify-center">
-              <Link to="/login" state={{ returnTo: "/apply" }}>
-                <Button variant="hero">Sign In</Button>
-              </Link>
-              <Link to="/login?signup=true" state={{ returnTo: "/apply" }}>
-                <Button variant="heroOutline">Create Account</Button>
-              </Link>
+              <Link to="/login"><Button>Sign In</Button></Link>
+              <Link to="/login?signup=true"><Button>Create</Button></Link>
             </div>
-            <button onClick={() => setShowLoginPrompt(false)} className="mt-4 text-xs text-muted-foreground hover:text-foreground">
-              Cancel
-            </button>
-          </motion.div>
+          </div>
         </div>
       )}
     </div>
