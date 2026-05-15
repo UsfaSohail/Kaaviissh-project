@@ -244,6 +244,51 @@ const Index = () => {
           <Link to="/drives"><Button variant="heroOutline" size="lg">{t("about.cta")}</Button></Link>
         </motion.div>
       </section>
+
+      {/* Success Stories Preview */}
+      {stories.length > 0 && (
+        <section className="py-20 px-4 bg-secondary/20">
+          <div className="container mx-auto max-w-6xl">
+            <div className="flex items-end justify-between mb-8">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-3">
+                  <Sparkles size={14} /> Real Impact
+                </div>
+                <h2 className="text-3xl font-bold text-foreground">Success Stories</h2>
+              </div>
+              <Link to="/success-stories" className="text-sm text-primary hover:underline flex items-center gap-1">
+                View all <ArrowRight size={14} />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {stories.slice(0, 3).map((s, i) => (
+                <motion.article
+                  key={s.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
+                  whileHover={{ y: -4 }}
+                  className="group bg-card border border-border rounded-2xl overflow-hidden shadow-md hover:shadow-xl hover:border-primary/40 transition-all"
+                >
+                  {s.image_url && (
+                    <div className="aspect-video overflow-hidden bg-secondary">
+                      <img src={s.image_url} alt={s.title_en} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    </div>
+                  )}
+                  <div className="p-5">
+                    <h3 className="font-bold text-foreground line-clamp-1">{lang === "ur" ? s.title_ur || s.title_en : s.title_en}</h3>
+                    <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{lang === "ur" ? s.description_ur || s.description_en : s.description_en}</p>
+                  </div>
+                </motion.article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* FAQ */}
+      <FAQSection />
     </div>
   );
 };
