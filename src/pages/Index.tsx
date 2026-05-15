@@ -54,6 +54,7 @@ const Index = () => {
   const { quotes } = useQuotes();
   const { impact } = useImpactCounter();
   const { items: rationItems } = useRationBagItems();
+  const { stories } = useSuccessStories(true);
   const [bagPrice, setBagPrice] = useState(10000);
   const [bagQty, setBagQty] = useState(1);
   const quote = quotes[0];
