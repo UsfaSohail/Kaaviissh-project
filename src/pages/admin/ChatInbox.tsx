@@ -82,7 +82,7 @@ const ChatInbox = () => {
           {selectedUser ? (
             <>
               <div className="p-3 border-b border-border flex items-center justify-between">
-                <span className="text-sm text-foreground font-medium">Chat with {userNames[selectedUser] || selectedUser?.slice(0, 8)}</span>
+                <span className="text-sm text-foreground font-medium">Chat with {userNames[selectedUser] || "user"}</span>
               </div>
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {grouped[selectedUser]?.map(msg => (
