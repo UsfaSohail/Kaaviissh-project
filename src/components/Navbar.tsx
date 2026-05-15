@@ -79,6 +79,8 @@ const Navbar = () => {
               {lang === "en" ? "اردو" : "English"}
             </button>
 
+            {user && <NotificationBell />}
+
             {user && (
               <>
                 {isAdmin && (
