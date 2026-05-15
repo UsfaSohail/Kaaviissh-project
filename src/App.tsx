@@ -70,6 +70,8 @@ const App = () => (
                 <Route path="chat" element={<ChatInbox />} />
                 <Route path="ration-bag" element={<RationBagManager />} />
                 <Route path="legal" element={<LegalContentManager />} />
+                <Route path="volunteers" element={<VolunteersManager />} />
+                <Route path="stories" element={<SuccessStoriesManager />} />
                 <Route path="profile" element={<AdminProfile />} />
               </Route>
 
