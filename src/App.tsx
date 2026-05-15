@@ -35,6 +35,10 @@ import ChatInbox from "./pages/admin/ChatInbox";
 import RationBagManager from "./pages/admin/RationBagManager";
 import LegalContentManager from "./pages/admin/LegalContentManager";
 import AdminProfile from "./pages/admin/AdminProfile";
+import Volunteer from "./pages/Volunteer";
+import SuccessStories from "./pages/SuccessStories";
+import VolunteersManager from "./pages/admin/VolunteersManager";
+import SuccessStoriesManager from "./pages/admin/SuccessStoriesManager";
 
 
 const queryClient = new QueryClient();
