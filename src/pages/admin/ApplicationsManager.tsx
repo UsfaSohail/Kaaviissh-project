@@ -144,6 +144,14 @@ const ApplicationsManager = () => {
         message: `Your application has been ${status}`,
         sender: "admin"
       });
+      if (application.user_id) {
+        await createNotification(
+          application.user_id,
+          `Help Application ${status}`,
+          `Your help application has been ${status.toLowerCase()}.`,
+          status === "Approved" ? "success" : "error"
+        );
+      }
     }
   };
 
