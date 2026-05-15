@@ -91,6 +91,8 @@ const App = () => (
                     <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/chat" element={<Chat />} />
                     <Route path="/profile" element={<UserProfile />} />
+                    <Route path="/volunteer" element={<Volunteer />} />
+                    <Route path="/success-stories" element={<SuccessStories />} />
                     <Route path="/:slug" element={<LegalPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
