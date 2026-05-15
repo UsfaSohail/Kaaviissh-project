@@ -15,18 +15,24 @@ const DonationsManager = () => {
 
   const verify = async (id: string) => {
     try {
-      await updateDonation(id, { status: "verified" }); // update backend
+      await updateDonation(id, { status: "verified" });
       toast.success("Donation verified!");
 
-      // Update case raised_amount if donation has case_id
       const donation = donations.find(d => d.id === id);
       if (donation && donation.case_id) {
-        // Find the case and update raised_amount
         const caseToUpdate = await supabase.from("cases").select("raised_amount").eq("id", donation.case_id).single();
         if (caseToUpdate.data) {
           const newRaised = Number(caseToUpdate.data.raised_amount) + Number(donation.amount);
           await updateCase(donation.case_id, { raised_amount: newRaised });
         }
+      }
+      if (donation?.user_id) {
+        await createNotification(
+          donation.user_id,
+          "Donation Verified",
+          `Your donation of Rs. ${Number(donation.amount).toLocaleString()} has been verified. Thank you!`,
+          "success"
+        );
       }
     } catch (err) {
       toast.error("Failed to verify donation.");
