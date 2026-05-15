@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import LogoutDialog from "@/components/LogoutDialog";
+import NotificationBell from "@/components/NotificationBell";
 import logo from "@/assets/kaaviissh-logo.jpeg";
 
 const Navbar = () => {
