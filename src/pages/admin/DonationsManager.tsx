@@ -5,6 +5,7 @@ import { useCases } from "@/hooks/useCases";
 import { Check, Download, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { createNotification } from "@/hooks/useNotifications";
 
 const DonationsManager = () => {
   const { donations, loading, updateDonation, exportCSV } = useDonations();
