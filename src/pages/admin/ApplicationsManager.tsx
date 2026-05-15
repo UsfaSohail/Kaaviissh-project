@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useApplications } from "@/hooks/useApplications";
 import { useChat } from "@/hooks/useChat";
+import { createNotification } from "@/hooks/useNotifications";
 import { Check, X, Download, FileText, Eye, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -143,6 +144,14 @@ const ApplicationsManager = () => {
         message: `Your application has been ${status}`,
         sender: "admin"
       });
+      if (application.user_id) {
+        await createNotification(
+          application.user_id,
+          `Help Application ${status}`,
+          `Your help application has been ${status.toLowerCase()}.`,
+          status === "Approved" ? "success" : "error"
+        );
+      }
     }
   };
 

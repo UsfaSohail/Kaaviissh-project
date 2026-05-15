@@ -1,6 +1,7 @@
 import {
   LayoutDashboard, Briefcase, FileText, DollarSign, Users,
-  BarChart3, CreditCard, MessageSquare, Package, FileEdit, LogOut, UserCog
+  BarChart3, CreditCard, MessageSquare, Package, FileEdit, LogOut, UserCog,
+  HandHeart, Sparkles
 } from "lucide-react";
 
 import { NavLink, useNavigate } from "react-router-dom";
@@ -21,19 +22,20 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-// Added Profile item
 const items = [
   { title: "Overview", url: "/admin", icon: LayoutDashboard },
   { title: "Cases", url: "/admin/cases", icon: Briefcase },
   { title: "Blogs", url: "/admin/blogs", icon: FileText },
   { title: "Donations", url: "/admin/donations", icon: DollarSign },
   { title: "Applications", url: "/admin/applications", icon: Users },
+  { title: "Volunteers", url: "/admin/volunteers", icon: HandHeart },
+  { title: "Success Stories", url: "/admin/stories", icon: Sparkles },
   { title: "Impact Counter", url: "/admin/impact", icon: BarChart3 },
   { title: "Payment Methods", url: "/admin/payment-methods", icon: CreditCard },
   { title: "Chat Inbox", url: "/admin/chat", icon: MessageSquare },
   { title: "Ration Bag", url: "/admin/ration-bag", icon: Package },
   { title: "Legal Content", url: "/admin/legal", icon: FileEdit },
-  { title: "Profile", url: "/admin/profile", icon: UserCog }, // added
+  { title: "Profile", url: "/admin/profile", icon: UserCog },
 ];
 
 export function AdminSidebar() {

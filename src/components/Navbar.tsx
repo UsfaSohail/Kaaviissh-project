@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import LogoutDialog from "@/components/LogoutDialog";
+import NotificationBell from "@/components/NotificationBell";
 import logo from "@/assets/kaaviissh-logo.jpeg";
 
 const Navbar = () => {
@@ -21,6 +22,8 @@ const Navbar = () => {
     { label: t("nav.drives"), path: "/drives" },
     { label: t("nav.zakat"), path: "/zakat" },
     { label: t("nav.apply"), path: "/apply" },
+    { label: "Volunteer", path: "/volunteer" },
+    { label: "Stories", path: "/success-stories" },
     { label: t("nav.courses"), path: "/courses" },
     { label: t("nav.blog"), path: "/blog" },
     { label: t("nav.chat"), path: "/chat" },
@@ -75,6 +78,8 @@ const Navbar = () => {
               <Globe size={16} />
               {lang === "en" ? "اردو" : "English"}
             </button>
+
+            {user && <NotificationBell />}
 
             {user && (
               <>

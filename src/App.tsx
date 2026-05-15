@@ -35,6 +35,10 @@ import ChatInbox from "./pages/admin/ChatInbox";
 import RationBagManager from "./pages/admin/RationBagManager";
 import LegalContentManager from "./pages/admin/LegalContentManager";
 import AdminProfile from "./pages/admin/AdminProfile";
+import Volunteer from "./pages/Volunteer";
+import SuccessStories from "./pages/SuccessStories";
+import VolunteersManager from "./pages/admin/VolunteersManager";
+import SuccessStoriesManager from "./pages/admin/SuccessStoriesManager";
 
 
 const queryClient = new QueryClient();
@@ -66,6 +70,8 @@ const App = () => (
                 <Route path="chat" element={<ChatInbox />} />
                 <Route path="ration-bag" element={<RationBagManager />} />
                 <Route path="legal" element={<LegalContentManager />} />
+                <Route path="volunteers" element={<VolunteersManager />} />
+                <Route path="stories" element={<SuccessStoriesManager />} />
                 <Route path="profile" element={<AdminProfile />} />
               </Route>
 
@@ -85,6 +91,8 @@ const App = () => (
                     <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/chat" element={<Chat />} />
                     <Route path="/profile" element={<UserProfile />} />
+                    <Route path="/volunteer" element={<Volunteer />} />
+                    <Route path="/success-stories" element={<SuccessStories />} />
                     <Route path="/:slug" element={<LegalPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>

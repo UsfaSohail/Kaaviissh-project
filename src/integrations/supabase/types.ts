@@ -310,6 +310,36 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       payment_methods: {
         Row: {
           account_title: string
@@ -475,6 +505,45 @@ export type Database = {
         }
         Relationships: []
       }
+      success_stories: {
+        Row: {
+          completion_date: string | null
+          created_at: string
+          description_en: string
+          description_ur: string
+          id: string
+          image_url: string | null
+          is_published: boolean
+          title_en: string
+          title_ur: string
+          updated_at: string
+        }
+        Insert: {
+          completion_date?: string | null
+          created_at?: string
+          description_en?: string
+          description_ur?: string
+          id?: string
+          image_url?: string | null
+          is_published?: boolean
+          title_en: string
+          title_ur?: string
+          updated_at?: string
+        }
+        Update: {
+          completion_date?: string | null
+          created_at?: string
+          description_en?: string
+          description_ur?: string
+          id?: string
+          image_url?: string | null
+          is_published?: boolean
+          title_en?: string
+          title_ur?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -490,6 +559,54 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      volunteer_applications: {
+        Row: {
+          admin_notes: string | null
+          availability: string | null
+          city: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          motivation: string | null
+          phone: string | null
+          skills: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          availability?: string | null
+          city?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          motivation?: string | null
+          phone?: string | null
+          skills?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          availability?: string | null
+          city?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          motivation?: string | null
+          phone?: string | null
+          skills?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }

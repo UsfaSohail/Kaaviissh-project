@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 // Memoized InputField
-const InputField = memo(({ label, value, onChange, placeholder, type = "text" }) => (
+const InputField = memo(({ label, value, onChange, placeholder, type = "text" }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) => (
   <div>
     <label className="text-xs text-muted-foreground mb-1 block">{label}</label>
     <input
