@@ -26,18 +26,18 @@ const ChatInbox = () => {
       if (userIds.length === 0) return;
       const { data } = await supabase
         .from("profiles")
-        .select("id, name")
+        .select("id, name, email")
         .in("id", userIds);
       if (data) {
         const names: Record<string, string> = {};
         data.forEach(profile => {
-          names[profile.id] = profile.name;
+          names[profile.id] = profile.name?.trim() || profile.email || "Unknown user";
         });
         setUserNames(names);
       }
     };
     fetchUserNames();
-  }, [userIds]);
+  }, [userIds.join(",")]);
 
   const handleSelectUser = async (uid: string) => {
     setSelectedUser(uid);
