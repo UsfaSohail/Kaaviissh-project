@@ -21,7 +21,7 @@ export type Database = {
           city: string | null
           cnic: string | null
           created_at: string
-          documents_url: string | null
+          document_urls: string[] | null
           full_name: string
           id: string
           income_details: string | null
@@ -35,7 +35,7 @@ export type Database = {
           city?: string | null
           cnic?: string | null
           created_at?: string
-          documents_url?: string | null
+          document_urls?: string[] | null
           full_name: string
           id?: string
           income_details?: string | null
@@ -49,7 +49,7 @@ export type Database = {
           city?: string | null
           cnic?: string | null
           created_at?: string
-          documents_url?: string | null
+          document_urls?: string[] | null
           full_name?: string
           id?: string
           income_details?: string | null
