@@ -3,6 +3,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ArrowLeft, ArrowRight, Upload } from "lucide-react";
+import CopyButton from "@/components/CopyButton";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { usePaymentMethods } from "@/hooks/usePaymentMethods";
 import { useDonations } from "@/hooks/useDonations";
