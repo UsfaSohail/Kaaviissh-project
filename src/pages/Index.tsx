@@ -9,6 +9,9 @@ import { useImpactCounter } from "@/hooks/useImpactCounter";
 import { useRationBagItems } from "@/hooks/useRationBagItems";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSuccessStories } from "@/hooks/useSuccessStories";
+import FAQSection from "@/components/FAQSection";
+import { Sparkles, ArrowRight } from "lucide-react";
 
 // Animated counter component
 const AnimatedCounter = ({ target, prefix = "", suffix = "" }: { target: number; prefix?: string; suffix?: string }) => {
