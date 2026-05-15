@@ -214,10 +214,32 @@ Date: ${new Date().toLocaleString("en-PK")}
                 <p className="text-muted-foreground text-sm">
                   {t("donate.sendVia", { amount: `Rs. ${Number(amount).toLocaleString()}`, method: method.method_name })}
                 </p>
-                <div className="bg-secondary rounded-xl p-4 space-y-2">
-                  <div><p className="text-xs text-muted-foreground">{t("donate.accountTitle")}</p><p className="text-foreground font-medium">{method.account_title}</p></div>
-                  {method.phone_number && <div><p className="text-xs text-muted-foreground">{t("donate.accountNumber")}</p><p className="text-lg font-mono text-foreground tracking-wider">{method.phone_number}</p></div>}
-                  {method.iban && <div><p className="text-xs text-muted-foreground">{t("donate.iban")}</p><p className="text-xs font-mono text-foreground">{method.iban}</p></div>}
+                <div className="bg-secondary rounded-xl p-4 space-y-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-start min-w-0">
+                      <p className="text-xs text-muted-foreground">{t("donate.accountTitle")}</p>
+                      <p className="text-foreground font-medium truncate">{method.account_title}</p>
+                    </div>
+                    <CopyButton value={method.account_title} label="Account title" />
+                  </div>
+                  {method.phone_number && (
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="text-start min-w-0">
+                        <p className="text-xs text-muted-foreground">{t("donate.accountNumber")}</p>
+                        <p className="text-lg font-mono text-foreground tracking-wider truncate">{method.phone_number}</p>
+                      </div>
+                      <CopyButton value={method.phone_number} label="Account number" />
+                    </div>
+                  )}
+                  {method.iban && (
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="text-start min-w-0">
+                        <p className="text-xs text-muted-foreground">{t("donate.iban")}</p>
+                        <p className="text-xs font-mono text-foreground break-all">{method.iban}</p>
+                      </div>
+                      <CopyButton value={method.iban} label="IBAN" />
+                    </div>
+                  )}
                 </div>
               </div>
             )}
