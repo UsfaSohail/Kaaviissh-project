@@ -113,12 +113,12 @@ const Navbar = () => {
 
             {!user && (
               <Link to="/login">
-                <Button variant="ghost" size="sm" className={isAdmin ? "text-xs px-2 py-1" : "text-sm"}>{t("nav.login")}</Button>
+                <Button variant="ghost" size="sm" className="text-[13px] px-2.5 py-1">{t("nav.login")}</Button>
               </Link>
             )}
 
             <Link to="/donate">
-              <Button variant="hero" size="sm" className={isAdmin ? "px-4 py-1 text-xs" : "px-6 py-2 text-sm"}>{t("nav.donate")}</Button>
+              <Button variant="hero" size="sm" className="px-3 py-1.5 text-[13px]">{t("nav.donate")}</Button>
             </Link>
           </div>
 
