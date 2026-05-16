@@ -29,6 +29,10 @@ const Navbar = () => {
     { label: t("nav.chat"), path: "/chat" },
   ];
 
+  const displayedLinks = isAdmin
+    ? navLinks.filter((link) => !["/apply", "/volunteer", "/chat"].includes(link.path))
+    : navLinks;
+
   const handleSignOut = async () => {
     setLogoutOpen(false);
     await signOut();
@@ -45,15 +49,15 @@ const Navbar = () => {
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
-        <div className="container mx-auto flex items-center justify-between h-16 px-4 gap-2">
+        <div className="container mx-auto flex flex-wrap items-center justify-between h-16 px-4 gap-2">
           <Link to="/" className="flex items-center gap-2 shrink-0">
             <img src={logo} alt="KAAVIISSH Foundation Logo" className="h-9 w-9 rounded-lg object-cover" />
             <span className="text-lg xl:text-xl font-bold tracking-wider text-foreground">KAAVIISSH</span>
             <span className="hidden 2xl:inline text-lg font-bold text-primary" style={{ fontFamily: "'Noto Nastaliq Urdu', serif" }}>کاوش</span>
           </Link>
 
-          <div className="hidden lg:flex items-center gap-0.5 xl:gap-1 min-w-0">
-            {navLinks.map((link) => (
+          <div className="hidden lg:flex lg:flex-wrap items-center gap-0.5 xl:gap-1 min-w-0">
+            {displayedLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
@@ -68,7 +72,7 @@ const Navbar = () => {
             ))}
           </div>
 
-          <div className="hidden lg:flex items-center gap-1 xl:gap-1.5 pl-2 ml-1 border-l border-border/50 shrink-0">
+          <div className="hidden lg:flex lg:flex-wrap items-center gap-1 xl:gap-1.5 pl-2 ml-1 border-l border-border/50 min-w-0">
             <button
               onClick={() => setLang(lang === "en" ? "ur" : "en")}
               className={`${buttonClasses} text-muted-foreground hover:text-foreground`}
