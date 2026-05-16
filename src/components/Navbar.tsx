@@ -37,12 +37,12 @@ const Navbar = () => {
 
   // Determine font size/padding depending on admin
   const linkClasses = isAdmin
-    ? "px-2 py-1 rounded-md text-xs font-medium transition-colors"
-    : "px-3 py-2 rounded-lg text-sm font-medium transition-colors";
+    ? "px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap"
+    : "px-3.5 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap";
 
   const buttonClasses = isAdmin
-    ? "flex items-center gap-1 px-2 py-1 rounded-md text-xs transition-colors"
-    : "flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-colors";
+    ? "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs transition-colors whitespace-nowrap"
+    : "flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm transition-colors whitespace-nowrap";
 
   return (
     <>
@@ -54,7 +54,7 @@ const Navbar = () => {
             <span className="text-lg font-bold text-primary" style={{ fontFamily: "'Noto Nastaliq Urdu', serif" }}>کاوش</span>
           </Link>
 
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-1.5 xl:gap-2">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
@@ -70,7 +70,7 @@ const Navbar = () => {
             ))}
           </div>
 
-          <div className="hidden lg:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-2 xl:gap-3 pl-2 ml-2 border-l border-border/50">
             <button
               onClick={() => setLang(lang === "en" ? "ur" : "en")}
               className={`${buttonClasses} text-muted-foreground hover:text-foreground`}

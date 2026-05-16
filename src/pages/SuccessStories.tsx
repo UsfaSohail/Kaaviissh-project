@@ -1,12 +1,15 @@
-import { motion } from "framer-motion";
-import { Sparkles, Calendar } from "lucide-react";
-import { useSuccessStories } from "@/hooks/useSuccessStories";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Sparkles, Calendar, X } from "lucide-react";
+import { useSuccessStories, type SuccessStory } from "@/hooks/useSuccessStories";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
-const SuccessStories = () => {
+const SuccessStoriesPage = () => {
   const { stories, loading } = useSuccessStories(true);
   const { lang } = useLanguage();
+  const [active, setActive] = useState<SuccessStory | null>(null);
 
   return (
     <div className="pt-24 pb-16 px-4 min-h-screen">
@@ -35,14 +38,15 @@ const SuccessStories = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {stories.map((s, i) => (
-              <motion.article
+              <motion.button
                 key={s.id}
+                onClick={() => setActive(s)}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.05 }}
                 whileHover={{ y: -6 }}
-                className="group bg-card border border-border rounded-2xl overflow-hidden shadow-md hover:shadow-2xl hover:border-primary/40 transition-all"
+                className="group text-start bg-card border border-border rounded-2xl overflow-hidden shadow-md hover:shadow-2xl hover:border-primary/40 transition-all focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 {s.image_url && (
                   <div className="aspect-video overflow-hidden bg-secondary">
@@ -55,7 +59,7 @@ const SuccessStories = () => {
                   </div>
                 )}
                 <div className="p-5">
-                  <h3 className="text-lg font-bold text-foreground mb-2 line-clamp-2">
+                  <h3 className="text-lg font-bold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
                     {lang === "ur" ? s.title_ur || s.title_en : s.title_en}
                   </h3>
                   <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
@@ -67,14 +71,52 @@ const SuccessStories = () => {
                       Completed {new Date(s.completion_date).toLocaleDateString(undefined, { month: "long", year: "numeric" })}
                     </div>
                   )}
+                  <div className="mt-3 text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                    Read full story →
+                  </div>
                 </div>
-              </motion.article>
+              </motion.button>
             ))}
           </div>
         )}
       </div>
+
+      <Dialog open={!!active} onOpenChange={(o) => !o && setActive(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 gap-0">
+          <AnimatePresence mode="wait">
+            {active && (
+              <motion.div
+                key={active.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+              >
+                {active.image_url && (
+                  <div className="aspect-video overflow-hidden bg-secondary">
+                    <img src={active.image_url} alt="" className="w-full h-full object-cover" />
+                  </div>
+                )}
+                <div className="p-6">
+                  <h2 className="text-2xl font-bold text-foreground mb-3" dir={lang === "ur" ? "rtl" : "ltr"}>
+                    {lang === "ur" ? active.title_ur || active.title_en : active.title_en}
+                  </h2>
+                  {active.completion_date && (
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4">
+                      <Calendar size={12} />
+                      Completed {new Date(active.completion_date).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}
+                    </div>
+                  )}
+                  <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap" dir={lang === "ur" ? "rtl" : "ltr"}>
+                    {lang === "ur" ? active.description_ur || active.description_en : active.description_en}
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
-export default SuccessStories;
+export default SuccessStoriesPage;

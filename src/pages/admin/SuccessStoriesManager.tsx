@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useSuccessStories, type SuccessStory } from "@/hooks/useSuccessStories";
 import { Button } from "@/components/ui/button";
-import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, Upload, X as XIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +26,32 @@ const SuccessStoriesManager = () => {
   const { stories, loading, create, update, remove } = useSuccessStories(false);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Partial<SuccessStory>>(empty);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleUpload = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be under 5MB");
+      return;
+    }
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error } = await supabase.storage.from("success-stories").upload(path, file, { upsert: false });
+    if (error) {
+      toast.error("Upload failed: " + error.message);
+      setUploading(false);
+      return;
+    }
+    const { data } = supabase.storage.from("success-stories").getPublicUrl(path);
+    setEditing((prev) => ({ ...prev, image_url: data.publicUrl }));
+    toast.success("Image uploaded");
+    setUploading(false);
+  };
 
   const openNew = () => {
     setEditing(empty);
@@ -119,7 +146,42 @@ const SuccessStoriesManager = () => {
             <Field label="Title (Urdu)" value={editing.title_ur || ""} onChange={(v) => setEditing({ ...editing, title_ur: v })} />
             <Field label="Description (English)" value={editing.description_en || ""} onChange={(v) => setEditing({ ...editing, description_en: v })} textarea />
             <Field label="Description (Urdu)" value={editing.description_ur || ""} onChange={(v) => setEditing({ ...editing, description_ur: v })} textarea />
-            <Field label="Image URL" value={editing.image_url || ""} onChange={(v) => setEditing({ ...editing, image_url: v })} placeholder="https://..." />
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">Story Image</label>
+              {editing.image_url ? (
+                <div className="relative group rounded-lg overflow-hidden border border-border">
+                  <img src={editing.image_url} alt="" className="w-full aspect-video object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => setEditing({ ...editing, image_url: "" })}
+                    className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                  >
+                    <XIcon size={14} />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="w-full flex flex-col items-center justify-center gap-2 py-8 px-3 rounded-lg border-2 border-dashed border-border hover:border-primary hover:bg-secondary/50 transition-colors text-muted-foreground hover:text-foreground disabled:opacity-50"
+                >
+                  {uploading ? <Loader2 size={20} className="animate-spin" /> : <Upload size={20} />}
+                  <span className="text-xs">{uploading ? "Uploading..." : "Click to upload image (max 5MB)"}</span>
+                </button>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) handleUpload(f);
+                  e.target.value = "";
+                }}
+              />
+            </div>
             <Field label="Completion Date" value={editing.completion_date || ""} onChange={(v) => setEditing({ ...editing, completion_date: v })} type="date" />
             <label className="flex items-center gap-2 text-sm text-foreground">
               <input
