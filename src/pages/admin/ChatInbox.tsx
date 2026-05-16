@@ -24,17 +24,26 @@ const ChatInbox = () => {
   useEffect(() => {
     const fetchUserNames = async () => {
       if (userIds.length === 0) return;
+      const names: Record<string, string> = {};
       const { data } = await supabase
         .from("profiles")
         .select("id, name, email")
         .in("id", userIds);
       if (data) {
-        const names: Record<string, string> = {};
         data.forEach(profile => {
-          names[profile.id] = profile.name?.trim() || profile.email || "Unknown user";
+          const n = profile.name?.trim();
+          if (n || profile.email) names[profile.id] = n || profile.email!;
         });
-        setUserNames(names);
       }
+      // Fallback to auth.users via edge function for any missing ids
+      const missing = userIds.filter(id => !names[id]);
+      if (missing.length > 0) {
+        try {
+          const { data: fnData } = await supabase.functions.invoke("get-user-names", { body: { ids: missing } });
+          if (fnData?.names) Object.assign(names, fnData.names);
+        } catch (_) { /* ignore */ }
+      }
+      setUserNames(names);
     };
     fetchUserNames();
   }, [userIds.join(",")]);

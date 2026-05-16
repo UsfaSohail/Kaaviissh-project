@@ -35,26 +35,24 @@ const Navbar = () => {
     navigate("/");
   };
 
-  // Determine font size/padding depending on admin
-  const linkClasses = isAdmin
-    ? "px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap"
-    : "px-3.5 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap";
+  // Tight padding so all items fit on smaller desktops without overlap
+  const linkClasses =
+    "px-2 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap";
 
-  const buttonClasses = isAdmin
-    ? "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs transition-colors whitespace-nowrap"
-    : "flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm transition-colors whitespace-nowrap";
+  const buttonClasses =
+    "flex items-center gap-1 px-2 py-1.5 rounded-md text-[13px] transition-colors whitespace-nowrap";
 
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
-        <div className="container mx-auto flex items-center justify-between h-16 px-4">
-          <Link to="/" className="flex items-center gap-2">
+        <div className="container mx-auto flex items-center justify-between h-16 px-4 gap-2">
+          <Link to="/" className="flex items-center gap-2 shrink-0">
             <img src={logo} alt="KAAVIISSH Foundation Logo" className="h-9 w-9 rounded-lg object-cover" />
-            <span className="text-xl font-bold tracking-wider text-foreground">KAAVIISSH</span>
-            <span className="text-lg font-bold text-primary" style={{ fontFamily: "'Noto Nastaliq Urdu', serif" }}>کاوش</span>
+            <span className="text-lg xl:text-xl font-bold tracking-wider text-foreground">KAAVIISSH</span>
+            <span className="hidden 2xl:inline text-lg font-bold text-primary" style={{ fontFamily: "'Noto Nastaliq Urdu', serif" }}>کاوش</span>
           </Link>
 
-          <div className="hidden lg:flex items-center gap-1.5 xl:gap-2">
+          <div className="hidden lg:flex items-center gap-0.5 xl:gap-1 min-w-0">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
@@ -70,7 +68,7 @@ const Navbar = () => {
             ))}
           </div>
 
-          <div className="hidden lg:flex items-center gap-2 xl:gap-3 pl-2 ml-2 border-l border-border/50">
+          <div className="hidden lg:flex items-center gap-1 xl:gap-1.5 pl-2 ml-1 border-l border-border/50 shrink-0">
             <button
               onClick={() => setLang(lang === "en" ? "ur" : "en")}
               className={`${buttonClasses} text-muted-foreground hover:text-foreground`}
@@ -115,12 +113,12 @@ const Navbar = () => {
 
             {!user && (
               <Link to="/login">
-                <Button variant="ghost" size="sm" className={isAdmin ? "text-xs px-2 py-1" : "text-sm"}>{t("nav.login")}</Button>
+                <Button variant="ghost" size="sm" className="text-[13px] px-2.5 py-1">{t("nav.login")}</Button>
               </Link>
             )}
 
             <Link to="/donate">
-              <Button variant="hero" size="sm" className={isAdmin ? "px-4 py-1 text-xs" : "px-6 py-2 text-sm"}>{t("nav.donate")}</Button>
+              <Button variant="hero" size="sm" className="px-3 py-1.5 text-[13px]">{t("nav.donate")}</Button>
             </Link>
           </div>
 
