@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useSuccessStories, type SuccessStory } from "@/hooks/useSuccessStories";
 import { Button } from "@/components/ui/button";
-import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, Upload, X as XIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
   DialogContent,
