@@ -39,40 +39,44 @@ const Navbar = () => {
     navigate("/");
   };
 
-  // Tight padding so all items fit on smaller desktops without overlap
   const linkClasses =
     "px-2 py-1.5 rounded-md text-[13px] font-medium transition-colors whitespace-nowrap";
 
   const buttonClasses =
-    "flex items-center gap-1 px-2 py-1.5 rounded-md text-[13px] transition-colors whitespace-nowrap";
+    "inline-flex items-center gap-1 px-2 py-1.5 rounded-md text-[13px] transition-colors whitespace-nowrap shrink-0";
+
+  const navActionButtonClasses =
+    "h-9 min-h-9 shrink-0 rounded-md px-3 py-1.5 text-[13px] font-semibold leading-none";
 
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
-        <div className="container mx-auto flex flex-wrap items-center justify-between h-16 px-4 gap-2">
+        <div className="container mx-auto flex h-16 items-center justify-between gap-3 px-4">
           <Link to="/" className="flex items-center gap-2 shrink-0">
             <img src={logo} alt="KAAVIISSH Foundation Logo" className="h-9 w-9 rounded-lg object-cover" />
             <span className="text-lg xl:text-xl font-bold tracking-wider text-foreground">KAAVIISSH</span>
             <span className="hidden 2xl:inline text-lg font-bold text-primary" style={{ fontFamily: "'Noto Nastaliq Urdu', serif" }}>کاوش</span>
           </Link>
 
-          <div className="hidden lg:flex lg:flex-wrap items-center gap-0.5 xl:gap-1 min-w-0">
-            {displayedLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`${linkClasses} ${
-                  location.pathname === link.path
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+          <div className="hidden lg:flex flex-1 items-center justify-center min-w-0 px-1">
+            <div className="flex flex-nowrap items-center gap-0.5 xl:gap-1">
+              {displayedLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`${linkClasses} shrink-0 ${
+                    location.pathname === link.path
+                      ? "text-primary bg-primary/10"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
           </div>
 
-          <div className="hidden lg:flex lg:flex-wrap items-center gap-1 xl:gap-1.5 pl-2 ml-1 border-l border-border/50 min-w-0">
+          <div className="hidden lg:flex shrink-0 items-center flex-nowrap gap-1 xl:gap-1.5 pl-2 ml-1 border-l border-border/50">
             <button
               onClick={() => setLang(lang === "en" ? "ur" : "en")}
               className={`${buttonClasses} text-muted-foreground hover:text-foreground`}
@@ -116,22 +120,30 @@ const Navbar = () => {
             )}
 
             {!user && (
-              <Link to="/login">
-                <Button variant="ghost" size="sm" className="text-[13px] px-2.5 py-1">{t("nav.login")}</Button>
+              <Link to="/login" className="shrink-0">
+                <Button
+                  variant="ghost"
+                  className={`${navActionButtonClasses} px-2.5 font-medium hover:bg-accent hover:text-accent-foreground`}
+                >
+                  {t("nav.login")}
+                </Button>
               </Link>
             )}
 
-            <Link to="/donate">
-              <Button variant="hero" size="sm" className="px-3 py-1.5 text-[13px]">{t("nav.donate")}</Button>
+            <Link to="/donate" className="shrink-0">
+              <Button
+                className={`${navActionButtonClasses} bg-primary text-primary-foreground hover:bg-primary/80 shadow-md shadow-primary/20`}
+              >
+                {t("nav.donate")}
+              </Button>
             </Link>
           </div>
 
-          <button className="lg:hidden text-foreground" onClick={() => setOpen(!open)}>
+          <button className="lg:hidden shrink-0 text-foreground" onClick={() => setOpen(!open)} aria-label="Toggle menu">
             {open ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
-        {/* Mobile menu */}
         <AnimatePresence>
           {open && (
             <motion.div
