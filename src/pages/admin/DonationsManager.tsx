@@ -81,33 +81,34 @@ const DonationsManager = () => {
         </Button>
       </div>
 
-      <div className="bg-card border border-border rounded-xl overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead><tr className="border-b border-border bg-secondary/50">
-            <th className="p-3 w-10">
+      <div className="admin-table-card">
+        <table className="admin-table">
+          <thead><tr>
+            <th className="w-10">
               <input type="checkbox" checked={selected.size === donations.length && donations.length > 0} onChange={toggleAll} className="accent-primary" />
             </th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Donor</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Amount</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Type</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Method</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Status</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Date</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Actions</th>
+            <th>Donor</th>
+            <th>Amount</th>
+            <th>Type</th>
+            <th>Method</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
           </tr></thead>
           <tbody>
             {donations.map(d => (
-              <tr key={d.id} className="border-b border-border/50 hover:bg-secondary/30">
-                <td className="p-3">
+              <tr key={d.id}>
+                <td>
                   <input type="checkbox" checked={selected.has(d.id)} onChange={() => toggleSelect(d.id)} className="accent-primary" />
                 </td>
-                <td className="p-3 text-foreground">{d.donor_name || "Anonymous"}</td>
-                <td className="p-3 text-foreground font-medium">Rs. {Number(d.amount).toLocaleString()}</td>
-                <td className="p-3 text-muted-foreground">{d.type}</td>
-                <td className="p-3 text-muted-foreground">{d.payment_method || "—"}</td>
-                <td className="p-3"><span className={`px-2 py-1 rounded-full text-xs ${d.status === "verified" ? "bg-primary/20 text-primary" : "bg-yellow-500/20 text-yellow-400"}`}>{d.status}</span></td>
-                <td className="p-3 text-muted-foreground text-xs">{new Date(d.created_at).toLocaleDateString()}</td>
-                <td className="p-3 flex gap-2">
+                <td>{d.donor_name || "Anonymous"}</td>
+                <td className="font-medium">Rs. {Number(d.amount).toLocaleString()}</td>
+                <td className="text-muted-foreground">{d.type}</td>
+                <td className="text-muted-foreground">{d.payment_method || "—"}</td>
+                <td><span className={`px-2 py-1 rounded-full text-xs ${d.status === "verified" ? "bg-primary/20 text-primary" : "bg-yellow-500/20 text-yellow-400"}`}>{d.status}</span></td>
+                <td className="text-muted-foreground text-xs">{new Date(d.created_at).toLocaleDateString()}</td>
+                <td>
+                  <div className="admin-table-actions">
                   {d.screenshot_url && (
                     <button onClick={async () => {
                       let path = d.screenshot_url;
@@ -136,6 +137,7 @@ const DonationsManager = () => {
                   <button onClick={() => exportSingle(d)} className="text-muted-foreground hover:text-foreground" title="Export CSV">
                     <Download size={16} />
                   </button>
+                  </div>
                 </td>
               </tr>
             ))}

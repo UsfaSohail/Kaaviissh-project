@@ -49,7 +49,7 @@ const StatCard = ({
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay }}
     whileHover={{ y: -3 }}
-    className="bg-card border border-border rounded-xl p-5 hover:shadow-lg hover:border-primary/30 transition-all"
+    className="bg-card border border-border rounded-xl p-5 hover:shadow-md hover:border-primary/30 transition-all"
   >
     <div className="flex items-center gap-2 mb-2">
       <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${iconClass}`}>

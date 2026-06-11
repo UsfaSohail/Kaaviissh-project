@@ -65,23 +65,25 @@ const RationBagManager = () => {
         <Button onClick={saveBagPrice} size="sm">Save Price</Button>
       </div>
 
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
-        <table className="w-full text-sm">
-          <thead><tr className="border-b border-border bg-secondary/50">
-            <th className="text-start p-3 text-muted-foreground font-medium">Item (EN)</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Item (UR)</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Quantity</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Actions</th>
+      <div className="admin-table-card">
+        <table className="admin-table">
+          <thead><tr>
+            <th>Item (EN)</th>
+            <th>Item (UR)</th>
+            <th>Quantity</th>
+            <th>Actions</th>
           </tr></thead>
           <tbody>
             {items.map(item => (
-              <tr key={item.id} className="border-b border-border/50 hover:bg-secondary/30">
-                <td className="p-3 text-foreground">{item.item_name_en}</td>
-                <td className="p-3 text-foreground" dir="rtl">{item.item_name_ur}</td>
-                <td className="p-3 text-muted-foreground">{item.quantity} {item.unit}</td>
-                <td className="p-3 flex gap-2">
-                  <button onClick={() => openEdit(item)} className="text-muted-foreground hover:text-foreground"><Pencil size={14} /></button>
-                  <button onClick={() => handleDelete(item.id)} className="text-muted-foreground hover:text-destructive"><Trash2 size={14} /></button>
+              <tr key={item.id}>
+                <td>{item.item_name_en}</td>
+                <td dir="rtl">{item.item_name_ur}</td>
+                <td className="text-muted-foreground">{item.quantity} {item.unit}</td>
+                <td>
+                  <div className="admin-table-actions">
+                    <button onClick={() => openEdit(item)} className="text-muted-foreground hover:text-foreground"><Pencil size={14} /></button>
+                    <button onClick={() => handleDelete(item.id)} className="text-muted-foreground hover:text-destructive"><Trash2 size={14} /></button>
+                  </div>
                 </td>
               </tr>
             ))}

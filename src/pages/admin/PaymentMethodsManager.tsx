@@ -50,31 +50,33 @@ const PaymentMethodsManager = () => {
         <h2 className="text-2xl font-bold text-foreground">Payment Methods</h2>
         <Button onClick={openNew} className="gap-2"><Plus size={16} /> Add Method</Button>
       </div>
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
-        <table className="w-full text-sm">
-          <thead><tr className="border-b border-border bg-secondary/50">
-            <th className="text-start p-3 text-muted-foreground font-medium">Method</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Account Title</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Phone</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">IBAN</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Active</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Actions</th>
+      <div className="admin-table-card">
+        <table className="admin-table">
+          <thead><tr>
+            <th>Method</th>
+            <th>Account Title</th>
+            <th>Phone</th>
+            <th>IBAN</th>
+            <th>Active</th>
+            <th>Actions</th>
           </tr></thead>
           <tbody>
             {methods.map(m => (
-              <tr key={m.id} className="border-b border-border/50 hover:bg-secondary/30">
-                <td className="p-3 text-foreground font-medium">{m.method_name}</td>
-                <td className="p-3 text-muted-foreground">{m.account_title}</td>
-                <td className="p-3 text-muted-foreground">{m.phone_number || "—"}</td>
-                <td className="p-3 text-muted-foreground text-xs font-mono">{m.iban || "—"}</td>
-                <td className="p-3">
+              <tr key={m.id}>
+                <td className="font-medium">{m.method_name}</td>
+                <td className="text-muted-foreground">{m.account_title}</td>
+                <td className="text-muted-foreground">{m.phone_number || "—"}</td>
+                <td className="text-muted-foreground text-xs font-mono">{m.iban || "—"}</td>
+                <td>
                   <button onClick={() => toggleActive(m.id, m.is_active)} className={`px-3 py-1 rounded-full text-xs font-medium ${m.is_active ? "bg-primary/20 text-primary" : "bg-secondary text-muted-foreground"}`}>
                     {m.is_active ? "Active" : "Inactive"}
                   </button>
                 </td>
-                <td className="p-3 flex gap-2">
-                  <button onClick={() => openEdit(m)} className="text-muted-foreground hover:text-foreground"><Pencil size={14} /></button>
-                  <button onClick={() => handleDelete(m.id)} className="text-muted-foreground hover:text-destructive"><Trash2 size={14} /></button>
+                <td>
+                  <div className="admin-table-actions">
+                    <button onClick={() => openEdit(m)} className="text-muted-foreground hover:text-foreground"><Pencil size={14} /></button>
+                    <button onClick={() => handleDelete(m.id)} className="text-muted-foreground hover:text-destructive"><Trash2 size={14} /></button>
+                  </div>
                 </td>
               </tr>
             ))}

@@ -41,23 +41,25 @@ const BlogManager = () => {
         <Button onClick={openNew} className="gap-2"><Plus size={16} /> New Post</Button>
       </div>
 
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
-        <table className="w-full text-sm">
-          <thead><tr className="border-b border-border bg-secondary/50">
-            <th className="text-start p-3 text-muted-foreground font-medium">Title</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Category</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Published</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Actions</th>
+      <div className="admin-table-card">
+        <table className="admin-table">
+          <thead><tr>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Published</th>
+            <th>Actions</th>
           </tr></thead>
           <tbody>
             {posts.map(p => (
-              <tr key={p.id} className="border-b border-border/50 hover:bg-secondary/30">
-                <td className="p-3 text-foreground">{p.title_en}</td>
-                <td className="p-3 text-muted-foreground">{p.category || "—"}</td>
-                <td className="p-3"><span className={`px-2 py-1 rounded-full text-xs ${p.is_published ? "bg-primary/20 text-primary" : "bg-secondary text-muted-foreground"}`}>{p.is_published ? "Published" : "Draft"}</span></td>
-                <td className="p-3 flex gap-2">
-                  <button onClick={() => openEdit(p)} className="text-muted-foreground hover:text-foreground"><Pencil size={14} /></button>
-                  <button onClick={() => handleDelete(p.id)} className="text-muted-foreground hover:text-destructive"><Trash2 size={14} /></button>
+              <tr key={p.id}>
+                <td>{p.title_en}</td>
+                <td className="text-muted-foreground">{p.category || "—"}</td>
+                <td><span className={`px-2 py-1 rounded-full text-xs ${p.is_published ? "bg-primary/20 text-primary" : "bg-secondary text-muted-foreground"}`}>{p.is_published ? "Published" : "Draft"}</span></td>
+                <td>
+                  <div className="admin-table-actions">
+                    <button onClick={() => openEdit(p)} className="text-muted-foreground hover:text-foreground"><Pencil size={14} /></button>
+                    <button onClick={() => handleDelete(p.id)} className="text-muted-foreground hover:text-destructive"><Trash2 size={14} /></button>
+                  </div>
                 </td>
               </tr>
             ))}

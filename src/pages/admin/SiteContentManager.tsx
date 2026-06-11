@@ -25,22 +25,24 @@ const SiteContentManager = () => {
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold text-foreground">Site Content</h2>
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
-        <table className="w-full text-sm">
-          <thead><tr className="border-b border-border bg-secondary/50">
-            <th className="text-start p-3 text-muted-foreground font-medium">Key</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Value (EN)</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Value (UR)</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Actions</th>
+      <div className="admin-table-card">
+        <table className="admin-table">
+          <thead><tr>
+            <th>Key</th>
+            <th>Value (EN)</th>
+            <th>Value (UR)</th>
+            <th>Actions</th>
           </tr></thead>
           <tbody>
             {allContent.map(item => (
-              <tr key={item.id} className="border-b border-border/50 hover:bg-secondary/30">
-                <td className="p-3 text-foreground font-mono text-xs">{item.key}</td>
-                <td className="p-3 text-muted-foreground text-xs max-w-[200px] truncate">{item.value_en}</td>
-                <td className="p-3 text-muted-foreground text-xs max-w-[200px] truncate" dir="rtl">{item.value_ur}</td>
-                <td className="p-3">
-                  <button onClick={() => openEdit(item)} className="text-muted-foreground hover:text-foreground"><Pencil size={14} /></button>
+              <tr key={item.id}>
+                <td className="font-mono text-xs">{item.key}</td>
+                <td className="text-muted-foreground text-xs max-w-[200px] truncate">{item.value_en}</td>
+                <td className="text-muted-foreground text-xs max-w-[200px] truncate" dir="rtl">{item.value_ur}</td>
+                <td>
+                  <div className="admin-table-actions">
+                    <button onClick={() => openEdit(item)} className="text-muted-foreground hover:text-foreground"><Pencil size={14} /></button>
+                  </div>
                 </td>
               </tr>
             ))}

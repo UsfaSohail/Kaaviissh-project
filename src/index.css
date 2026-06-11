@@ -128,6 +128,36 @@
   }
 }
 
+@layer components {
+  .admin-table-card {
+    @apply bg-card border border-border rounded-xl overflow-x-auto;
+  }
+
+  .admin-table {
+    @apply w-full text-sm border-collapse;
+  }
+
+  .admin-table thead tr {
+    @apply border-b border-border bg-secondary/50;
+  }
+
+  .admin-table th {
+    @apply p-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap;
+  }
+
+  .admin-table td {
+    @apply p-3 align-middle text-foreground;
+  }
+
+  .admin-table tbody tr {
+    @apply border-b border-border/50 transition-colors hover:bg-secondary/30;
+  }
+
+  .admin-table-actions {
+    @apply flex items-center gap-2;
+  }
+}
+
 @layer utilities {
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-emerald-400;

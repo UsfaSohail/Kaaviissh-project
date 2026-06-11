@@ -111,17 +111,17 @@ const VolunteersManager = () => {
         </div>
       </div>
 
-      <div className="bg-card border border-border rounded-xl overflow-x-auto">
-        <table className="w-full text-sm">
+      <div className="admin-table-card">
+        <table className="admin-table">
           <thead>
-            <tr className="border-b border-border bg-secondary/50 text-start">
-              <th className="text-start p-3 text-muted-foreground font-medium">Name</th>
-              <th className="text-start p-3 text-muted-foreground font-medium">Email</th>
-              <th className="text-start p-3 text-muted-foreground font-medium">City</th>
-              <th className="text-start p-3 text-muted-foreground font-medium">Skills</th>
-              <th className="text-start p-3 text-muted-foreground font-medium">Status</th>
-              <th className="text-start p-3 text-muted-foreground font-medium">Date</th>
-              <th className="text-start p-3 text-muted-foreground font-medium">Actions</th>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>City</th>
+              <th>Skills</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -131,17 +131,17 @@ const VolunteersManager = () => {
               <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">No applications match your filters.</td></tr>
             ) : (
               filtered.map((v) => (
-                <tr key={v.id} className="border-b border-border/50 hover:bg-secondary/30 transition-colors">
-                  <td className="p-3 text-foreground font-medium">{v.full_name}</td>
-                  <td className="p-3 text-muted-foreground">{v.email}</td>
-                  <td className="p-3 text-muted-foreground">{v.city || "—"}</td>
-                  <td className="p-3 text-muted-foreground max-w-[200px] truncate">{v.skills || "—"}</td>
-                  <td className="p-3">
-                    <span className={`px-2 py-0.5 rounded-full text-xs border ${STATUS_STYLES[v.status] || ""}`}>{v.status}</span>
+                <tr key={v.id}>
+                  <td className="font-medium">{v.full_name}</td>
+                  <td className="text-muted-foreground">{v.email}</td>
+                  <td className="text-muted-foreground">{v.city || "—"}</td>
+                  <td className="text-muted-foreground max-w-[200px] truncate">{v.skills || "—"}</td>
+                  <td>
+                    <span className={`px-2 py-0.5 rounded-full text-xs border border-border ${STATUS_STYLES[v.status] || ""}`}>{v.status}</span>
                   </td>
-                  <td className="p-3 text-muted-foreground text-xs">{new Date(v.created_at).toLocaleDateString()}</td>
-                  <td className="p-3">
-                    <div className="flex gap-1">
+                  <td className="text-muted-foreground text-xs">{new Date(v.created_at).toLocaleDateString()}</td>
+                  <td>
+                    <div className="admin-table-actions gap-1">
                       <button onClick={() => setViewing(v)} className="p-1.5 rounded hover:bg-secondary text-muted-foreground hover:text-foreground" title="View">
                         <Eye size={14} />
                       </button>

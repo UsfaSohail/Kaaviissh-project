@@ -40,23 +40,25 @@ const CasesManager = () => {
         <Button onClick={openNew} className="gap-2"><Plus size={16} /> Add Case</Button>
       </div>
 
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
-        <table className="w-full text-sm">
-          <thead><tr className="border-b border-border bg-secondary/50">
-            <th className="text-start p-3 text-muted-foreground font-medium">Title</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Status</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Progress</th>
-            <th className="text-start p-3 text-muted-foreground font-medium">Actions</th>
+      <div className="admin-table-card">
+        <table className="admin-table">
+          <thead><tr>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Progress</th>
+            <th>Actions</th>
           </tr></thead>
           <tbody>
             {cases.map(c => (
-              <tr key={c.id} className="border-b border-border/50 hover:bg-secondary/30">
-                <td className="p-3 text-foreground">{c.title_en}</td>
-                <td className="p-3"><span className={`px-2 py-1 rounded-full text-xs ${c.status === "Completed" ? "bg-primary/20 text-primary" : c.status === "In Progress" ? "bg-yellow-500/20 text-yellow-400" : "bg-blue-500/20 text-blue-400"}`}>{c.status}</span></td>
-                <td className="p-3 text-muted-foreground">Rs. {Number(c.raised_amount).toLocaleString()} / {Number(c.target_amount).toLocaleString()}</td>
-                <td className="p-3 flex gap-2">
-                  <button onClick={() => openEdit(c)} className="text-muted-foreground hover:text-foreground"><Pencil size={14} /></button>
-                  <button onClick={() => handleDelete(c.id)} className="text-muted-foreground hover:text-destructive"><Trash2 size={14} /></button>
+              <tr key={c.id}>
+                <td>{c.title_en}</td>
+                <td><span className={`px-2 py-1 rounded-full text-xs ${c.status === "Completed" ? "bg-primary/20 text-primary" : c.status === "In Progress" ? "bg-yellow-500/20 text-yellow-400" : "bg-blue-500/20 text-blue-400"}`}>{c.status}</span></td>
+                <td className="text-muted-foreground">Rs. {Number(c.raised_amount).toLocaleString()} / {Number(c.target_amount).toLocaleString()}</td>
+                <td>
+                  <div className="admin-table-actions">
+                    <button onClick={() => openEdit(c)} className="text-muted-foreground hover:text-foreground"><Pencil size={14} /></button>
+                    <button onClick={() => handleDelete(c.id)} className="text-muted-foreground hover:text-destructive"><Trash2 size={14} /></button>
+                  </div>
                 </td>
               </tr>
             ))}

@@ -165,32 +165,32 @@ const ApplicationsManager = () => {
         </Button>
       </div>
 
-      <div className="bg-card border rounded-xl overflow-x-auto">
-        <table className="w-full text-sm">
+      <div className="admin-table-card">
+        <table className="admin-table">
           <thead>
-            <tr className="border-b bg-secondary/50">
-              <th className="p-3">
+            <tr>
+              <th className="w-10">
                 <input
                   type="checkbox"
                   checked={selected.size === applications.length}
                   onChange={toggleAll}
                 />
               </th>
-              <th className="p-3">Name</th>
-              <th className="p-3">CNIC</th>
-              <th className="p-3">City</th>
-              <th className="p-3">Status</th>
-              <th className="p-3">Date</th>
-              <th className="p-3">Documents</th>
-              <th className="p-3">Actions</th>
+              <th>Name</th>
+              <th>CNIC</th>
+              <th>City</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Documents</th>
+              <th>Actions</th>
             </tr>
           </thead>
 
           <tbody>
             {applications.map(a => (
-              <tr key={a.id} className="border-b hover:bg-secondary/30">
+              <tr key={a.id}>
 
-                <td className="p-3">
+                <td>
                   <input
                     type="checkbox"
                     checked={selected.has(a.id)}
@@ -198,16 +198,15 @@ const ApplicationsManager = () => {
                   />
                 </td>
 
-                <td className="p-3">{a.full_name}</td>
-                <td className="p-3">{a.cnic}</td>
-                <td className="p-3">{a.city}</td>
-                <td className="p-3">{a.status}</td>
-                <td className="p-3">
+                <td>{a.full_name}</td>
+                <td>{a.cnic}</td>
+                <td>{a.city}</td>
+                <td>{a.status}</td>
+                <td>
                   {new Date(a.created_at).toLocaleDateString()}
                 </td>
 
-                {/* ✅ UPDATED DOCUMENT COLUMN */}
-                <td className="p-3">
+                <td>
                   {a.document_urls && a.document_urls.length > 0 ? (
                     <div className="flex gap-2 flex-wrap">
 
@@ -257,17 +256,19 @@ const ApplicationsManager = () => {
                   )}
                 </td>
 
-                <td className="p-3 flex gap-2">
-                  {a.status === "Pending" && (
-                    <>
-                      <button onClick={() => handleStatusUpdate(a, "Approved")}>
-                        <Check size={16} />
-                      </button>
-                      <button onClick={() => handleStatusUpdate(a, "Rejected")}>
-                        <X size={16} />
-                      </button>
-                    </>
-                  )}
+                <td>
+                  <div className="admin-table-actions">
+                    {a.status === "Pending" && (
+                      <>
+                        <button onClick={() => handleStatusUpdate(a, "Approved")}>
+                          <Check size={16} />
+                        </button>
+                        <button onClick={() => handleStatusUpdate(a, "Rejected")}>
+                          <X size={16} />
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </td>
 
               </tr>
